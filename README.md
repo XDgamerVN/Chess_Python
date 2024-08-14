@@ -10,7 +10,7 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 
 - `assets/`: Thư mục chứa các tài nguyên cần thiết cho trò chơi như hình ảnh quân cờ dạng PNG.
     + `pieces/`: Thư mục chứa các hình ảnh của quân cờ trong trò chơi.
-- `bata_test/`: Thư mục dùng để lưu trữ dữ liệu thử nghiệm, có thể bao gồm các file test hoặc mẫu dữ liệu cho việc phát triển và kiểm thử.
+- `test/`: Thư mục dùng để lưu trữ dữ liệu thử nghiệm, có thể bao gồm các file test hoặc mẫu dữ liệu cho việc phát triển và kiểm thử.
 
 ### Các file Python
 
