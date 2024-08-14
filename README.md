@@ -1,4 +1,4 @@
-# Dự án Chess Game bằng Python
+# Dự án Chess Game bằng Python (chưa hoàn thiện)
 
 ## 1. Giới thiệu
 
