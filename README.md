@@ -24,4 +24,5 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 ### Yêu cầu hệ thống
 
 - Python 3.x
+- pygamne
 
