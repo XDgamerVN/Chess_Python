@@ -8,9 +8,9 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 
 Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự án:
 
-- `assets/`: Thư mục chứa các tài nguyên cần thiết cho trò chơi như hình ảnh, âm thanh, hoặc các file hỗ trợ khác.
+- `assets/`: Thư mục chứa các tài nguyên cần thiết cho trò chơi như hình ảnh quân cờ dạng PNG.
+    + `pieces/`: Thư mục chứa các hình ảnh của quân cờ trong trò chơi.
 - `bata_test/`: Thư mục dùng để lưu trữ dữ liệu thử nghiệm, có thể bao gồm các file test hoặc mẫu dữ liệu cho việc phát triển và kiểm thử.
-- `pieces/`: Thư mục chứa các hình ảnh của quân cờ trong trò chơi.
 
 ### Các file Python
 
