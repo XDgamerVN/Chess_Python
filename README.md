@@ -26,3 +26,4 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 - Python 3.x
 - pygame
 
+#### Đang thử nghiệm chess
