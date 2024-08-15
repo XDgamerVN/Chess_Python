@@ -352,18 +352,9 @@ def check_promo_select():
 
 # Draw yellow rectangles for old and new positions (only once)
 def draw_move_indicator(old_pos, new_pos):
-    if old_pos is not None and is_valid_position(old_pos):
-        pygame.draw.rect(screen, 'yellow', [old_pos[0] * 100, old_pos[1] * 100, 100, 100], 5)
-    if new_pos is not None and is_valid_position(new_pos):
-        pygame.draw.rect(screen, 'yellow', [new_pos[0] * 100, new_pos[1] * 100, 100, 100], 5)
-
-
-def is_valid_position(pos):
-    if len(pos) != 2:
-        return False
-    x_coord, y_coord = pos
-    return 0 <= x_coord < 8 and 0 <= y_coord < 8
-
+    if new_pos and old_pos:
+        pygame.draw.rect(screen, 'yellow', [old_pos[0], old_pos[1], 100, 100], 5)
+        pygame.draw.rect(screen, 'yellow', [new_pos[0], new_pos[1], 100, 100], 5)
 
 # main game loop
 black_options = check_options(black_pieces, black_locations, 'black')
@@ -380,10 +371,8 @@ while run:
     screen.fill('dark gray')
     draw_board()
     draw_pieces()
-    draw_move_indicator(old_pos, new_pos)
     draw_captured()
     draw_check()
-
     if not game_over:
         white_promote, black_promote, promo_index = check_promotion()
         if white_promote or black_promote:
@@ -402,41 +391,6 @@ while run:
             x_coord = event.pos[0] // 100
             y_coord = event.pos[1] // 100
             click_coords = (x_coord, y_coord)
-
-            if is_valid_position((x_coord, y_coord)):
-                if selection is not None:
-                    new_pos = (x_coord, y_coord)
-                    if 'selected_piece' not in locals():
-                        selected_piece = None
-                    if selected_piece and (new_pos != old_pos):
-                        # Update position of the selected piece
-                        if turn_step < 2:
-                            index = selection
-                            if index < len(white_promotions):
-                                white_locations[index] = new_pos
-                            else:
-                                print("Error: Index out of range")
-                                black_locations[index] = new_pos
-                        else:
-                            index = selection
-                            if index < len(black_locations):
-                                black_locations[index] = new_pos
-                            else:
-                                print("Error: Index out of range")
-                        old_pos = selected_piece
-                        selection = None
-                        selected_piece = None
-                else:
-                    # Select a piece
-                    if turn_step < 2 and (x_coord, y_coord) in white_locations:
-                        selection = white_locations.index((x_coord, y_coord))
-                        selected_piece = (x_coord, y_coord)
-                    elif turn_step >= 2 and (x_coord, y_coord) in black_locations:
-                        selection = black_locations.index((x_coord, y_coord))
-                        selected_piece = (x_coord, y_coord)
-                    old_pos = None
-
-                # Update valid moves and handle selection
             if turn_step <= 1:
                 if click_coords == (8, 8) or click_coords == (9, 8):
                     winner = 'black'
@@ -562,6 +516,7 @@ while run:
                 valid_moves = []
                 black_options = check_options(black_pieces, black_locations, 'black')
                 white_options = check_options(white_pieces, white_locations, 'white')
+
 
     if winner != '':
         game_over = True
