@@ -56,43 +56,43 @@ def draw_board():
 # Tải hình ảnh quân cờ
 def load_pieces():
     pieces = {}
-    pieces['P'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_pawn.png'), PIECE_SIZE)
-    pieces['R'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_rook.png'), PIECE_SIZE)
-    pieces['N'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_knight.png'), PIECE_SIZE)
-    pieces['B'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_bishop.png'), PIECE_SIZE)
-    pieces['Q'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_queen.png'), PIECE_SIZE)
-    pieces['K'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_king.png'), PIECE_SIZE)
-    pieces['p'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_pawn.png'), PIECE_SIZE)
-    pieces['r'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_rook.png'), PIECE_SIZE)
-    pieces['n'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_knight.png'), PIECE_SIZE)
-    pieces['b'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_bishop.png'), PIECE_SIZE)
-    pieces['q'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_queen.png'), PIECE_SIZE)
-    pieces['k'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_king.png'), PIECE_SIZE)
+    pieces['P'] = pygame.transform.scale(pygame.image.load('assets/images/white_pawn.png'), PIECE_SIZE)
+    pieces['R'] = pygame.transform.scale(pygame.image.load('assets/images/white_rook.png'), PIECE_SIZE)
+    pieces['N'] = pygame.transform.scale(pygame.image.load('assets/images/white_knight.png'), PIECE_SIZE)
+    pieces['B'] = pygame.transform.scale(pygame.image.load('assets/images/white_bishop.png'), PIECE_SIZE)
+    pieces['Q'] = pygame.transform.scale(pygame.image.load('assets/images/white_queen.png'), PIECE_SIZE)
+    pieces['K'] = pygame.transform.scale(pygame.image.load('assets/images/white_king.png'), PIECE_SIZE)
+    pieces['p'] = pygame.transform.scale(pygame.image.load('assets/images/black_pawn.png'), PIECE_SIZE)
+    pieces['r'] = pygame.transform.scale(pygame.image.load('assets/images/black_rook.png'), PIECE_SIZE)
+    pieces['n'] = pygame.transform.scale(pygame.image.load('assets/images/black_knight.png'), PIECE_SIZE)
+    pieces['b'] = pygame.transform.scale(pygame.image.load('assets/images/black_bishop.png'), PIECE_SIZE)
+    pieces['q'] = pygame.transform.scale(pygame.image.load('assets/images/black_queen.png'), PIECE_SIZE)
+    pieces['k'] = pygame.transform.scale(pygame.image.load('assets/images/black_king.png'), PIECE_SIZE)
 
     captured_pieces = {}
-    captured_pieces['P'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_pawn.png'),
+    captured_pieces['P'] = pygame.transform.scale(pygame.image.load('assets/images/white_pawn.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['R'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_rook.png'),
+    captured_pieces['R'] = pygame.transform.scale(pygame.image.load('assets/images/white_rook.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['N'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_knight.png'),
+    captured_pieces['N'] = pygame.transform.scale(pygame.image.load('assets/images/white_knight.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['B'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_bishop.png'),
+    captured_pieces['B'] = pygame.transform.scale(pygame.image.load('assets/images/white_bishop.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['Q'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_queen.png'),
+    captured_pieces['Q'] = pygame.transform.scale(pygame.image.load('assets/images/white_queen.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['K'] = pygame.transform.scale(pygame.image.load('assets/pieces/white_king.png'),
+    captured_pieces['K'] = pygame.transform.scale(pygame.image.load('assets/images/white_king.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['p'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_pawn.png'),
+    captured_pieces['p'] = pygame.transform.scale(pygame.image.load('assets/images/black_pawn.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['r'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_rook.png'),
+    captured_pieces['r'] = pygame.transform.scale(pygame.image.load('assets/images/black_rook.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['n'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_knight.png'),
+    captured_pieces['n'] = pygame.transform.scale(pygame.image.load('assets/images/black_knight.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['b'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_bishop.png'),
+    captured_pieces['b'] = pygame.transform.scale(pygame.image.load('assets/images/black_bishop.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['q'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_queen.png'),
+    captured_pieces['q'] = pygame.transform.scale(pygame.image.load('assets/images/black_queen.png'),
                                                   CAPTURED_PIECE_SIZE)
-    captured_pieces['k'] = pygame.transform.scale(pygame.image.load('assets/pieces/black_king.png'),
+    captured_pieces['k'] = pygame.transform.scale(pygame.image.load('assets/images/black_king.png'),
                                                   CAPTURED_PIECE_SIZE)
     return pieces, captured_pieces
 
