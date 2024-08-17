@@ -21,11 +21,12 @@ BAKCGROUND = (179, 172, 168)
 YELLOW = (255, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
-LIGHT_GRAYISH_YELLOW = (235, 236, 208)
-MOSTLY_DESATURATED_DARK_GREEN = (115, 149, 82)
+COLOR_BOARD = [(235, 236, 208), (115, 149, 82)]
+COLOR_BOARD_Z = [(115, 149, 82), (235, 236, 208)]
 
 # Thiết lập kích thước ô vuông trên bàn cờ
-SQUARE_SIZE = CHESS_BOARD // 8
+DIMENSION = 8
+SQUARE_SIZE = CHESS_BOARD // DIMENSION
 
 # Thiết lập kích thước quân cờ và quân cờ nhỏ
 PIECE_SIZE = (SQUARE_SIZE, SQUARE_SIZE)
@@ -37,23 +38,27 @@ small_font = pygame.font.SysFont(font_path, CHESS_BOARD // 50, False, False)
 medium_font = pygame.font.SysFont(font_path, CHESS_BOARD // 40, False, False)
 large_font = pygame.font.SysFont(font_path, CHESS_BOARD // 25, False, False)
 
+# Hiện thị một lịch sẽ thay đổi
+selected_square = None
+captured_pieces_list = []
+previous_move = None
 
 # Tạo bàn cờ
 def draw_board():
-    for row in range(8):
-        for col in range(8):
-            color = LIGHT_GRAYISH_YELLOW if (row + col) % 2 == 0 else MOSTLY_DESATURATED_DARK_GREEN
+    for row in range(DIMENSION):
+        for col in range(DIMENSION):
+            color =COLOR_BOARD[((row + col) % 2)]
             pygame.draw.rect(screen, color, pygame.Rect(col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     # Vẽ chữ hàng
-    for i in range(8):
-        color = LIGHT_GRAYISH_YELLOW if i % 2 == 0 else MOSTLY_DESATURATED_DARK_GREEN
+    for i in range(DIMENSION):
+        color =COLOR_BOARD[(i % 2)]
         text = medium_font.render(chr(ord('a') + i), True, color)
         screen.blit(text, (SQUARE_SIZE * 0.87 + i * SQUARE_SIZE, SQUARE_SIZE * 7.74))
 
     # Vẽ chữ cột
-    for i in range(8):
-        color = MOSTLY_DESATURATED_DARK_GREEN if i % 2 == 0 else LIGHT_GRAYISH_YELLOW
+    for i in range(DIMENSION):
+        color =COLOR_BOARD_Z[(i % 2)]
         text = medium_font.render(str(8 - i), True, color)
         screen.blit(text, (SQUARE_SIZE * 0.022, i * SQUARE_SIZE))
 
@@ -64,18 +69,18 @@ def draw_board():
 
 # Tải hình ảnh quân cờ
 def load_pieces():
-    pieces = {'P': pygame.transform.scale(pygame.image.load('assets/images/white_pawn.png'), PIECE_SIZE),
-              'R': pygame.transform.scale(pygame.image.load('assets/images/white_rook.png'), PIECE_SIZE),
-              'N': pygame.transform.scale(pygame.image.load('assets/images/white_knight.png'), PIECE_SIZE),
-              'B': pygame.transform.scale(pygame.image.load('assets/images/white_bishop.png'), PIECE_SIZE),
-              'Q': pygame.transform.scale(pygame.image.load('assets/images/white_queen.png'), PIECE_SIZE),
-              'K': pygame.transform.scale(pygame.image.load('assets/images/white_king.png'), PIECE_SIZE),
-              'p': pygame.transform.scale(pygame.image.load('assets/images/black_pawn.png'), PIECE_SIZE),
-              'r': pygame.transform.scale(pygame.image.load('assets/images/black_rook.png'), PIECE_SIZE),
-              'n': pygame.transform.scale(pygame.image.load('assets/images/black_knight.png'), PIECE_SIZE),
-              'b': pygame.transform.scale(pygame.image.load('assets/images/black_bishop.png'), PIECE_SIZE),
-              'q': pygame.transform.scale(pygame.image.load('assets/images/black_queen.png'), PIECE_SIZE),
-              'k': pygame.transform.scale(pygame.image.load('assets/images/black_king.png'), PIECE_SIZE)}
+    pieces = {'P': pygame.transform.scale(pygame.image.load('assets/pieces/white_pawn.png'), PIECE_SIZE),
+              'R': pygame.transform.scale(pygame.image.load('assets/pieces/white_rook.png'), PIECE_SIZE),
+              'N': pygame.transform.scale(pygame.image.load('assets/pieces/white_knight.png'), PIECE_SIZE),
+              'B': pygame.transform.scale(pygame.image.load('assets/pieces/white_bishop.png'), PIECE_SIZE),
+              'Q': pygame.transform.scale(pygame.image.load('assets/pieces/white_queen.png'), PIECE_SIZE),
+              'K': pygame.transform.scale(pygame.image.load('assets/pieces/white_king.png'), PIECE_SIZE),
+              'p': pygame.transform.scale(pygame.image.load('assets/pieces/black_pawn.png'), PIECE_SIZE),
+              'r': pygame.transform.scale(pygame.image.load('assets/pieces/black_rook.png'), PIECE_SIZE),
+              'n': pygame.transform.scale(pygame.image.load('assets/pieces/black_knight.png'), PIECE_SIZE),
+              'b': pygame.transform.scale(pygame.image.load('assets/pieces/black_bishop.png'), PIECE_SIZE),
+              'q': pygame.transform.scale(pygame.image.load('assets/pieces/black_queen.png'), PIECE_SIZE),
+              'k': pygame.transform.scale(pygame.image.load('assets/pieces/black_king.png'), PIECE_SIZE)}
 
     captured_pieces = {'P': pygame.transform.scale(pygame.image.load('assets/pieces/white_pawn.png'),
                                                     CAPTURED_PIECE_SIZE),
@@ -115,11 +120,10 @@ def draw_pieces(board, pieces, selected_square=None):
                     # Vẽ viền xanh lá quanh quân cờ được chọn
                     s = pygame.Surface((SQUARE_SIZE, SQUARE_SIZE))
                     s.set_alpha(70)  # Giá trị trong suốt; 0 là trong suốt; 255 là không trong suốt
-                    s.fill(pygame.Color('yellow'))
+                    s.fill(pygame.Color(BLUE))
                     screen.blit(s, (col * SQUARE_SIZE, row * SQUARE_SIZE))
                 screen.blit(pieces[piece.symbol()], pygame.Rect(col * SQUARE_SIZE, row * SQUARE_SIZE,
                                                                 SQUARE_SIZE, SQUARE_SIZE))
-
 
 # Hiển thị quân cờ bị ăn
 def draw_captured_pieces(captured_pieces_list, captured_pieces):
@@ -138,10 +142,6 @@ def draw_captured_pieces(captured_pieces_list, captured_pieces):
             screen.blit(captured_pieces[piece], (SQUARE_SIZE // 100 + black_offset, SQUARE_SIZE * 8.7))
             black_offset += CAPTURED_PIECE_SIZE[0] + 5
 
-
-selected_square = None
-captured_pieces_list = []
-previous_move = None
 
 
 # Hiển thị các nước đi hợp lệ
@@ -207,6 +207,41 @@ def draw_move_log(screen, board):
         screen.blit(text_object, text_location)
         text_y += text_object.get_height()
 
+# Xử lý hoạt ảnh di chuyển của quân cờ
+def animate_move(move, board, screen, pieces, clock):
+    start_square = move.from_square
+    end_square = move.to_square
+    start_row, start_col = chess.square_rank(start_square), chess.square_file(start_square)
+    end_row, end_col = chess.square_rank(end_square), chess.square_file(end_square)
+    delta_row = end_row - start_row
+    delta_col = end_col - start_col
+    frames_per_square = 10  # Số khung hình mà quân cờ sẽ di chuyển trên mỗi ô
+    frame_count = (abs(delta_row) + abs(delta_col)) * frames_per_square
+
+    piece = board.piece_at(start_square)
+    if piece is None:
+        print(f"No piece at start_square {start_square}")  # Thông báo lỗi để kiểm tra
+        return
+
+    piece_image = pieces[piece.symbol()]
+
+    for frame in range(frame_count + 1):
+        row = start_row + delta_row * frame / frame_count
+        col = start_col + delta_col * frame / frame_count
+
+        draw_board()  # Vẽ lại bàn cờ
+        draw_pieces(board, pieces)  # Vẽ lại các quân cờ trên bàn cờ, không bao gồm quân cờ đang di chuyển
+
+        # Xóa quân cờ bị bắt nếu có
+        end_square_color = COLOR_BOARD_Z[(end_row + end_col) % 2]
+        pygame.draw.rect(screen, end_square_color,
+                         pygame.Rect(end_col * SQUARE_SIZE, (7 - end_row) * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
+        # Vẽ quân cờ đang di chuyển
+        screen.blit(piece_image, pygame.Rect(col * SQUARE_SIZE, (7 - row) * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+
+        pygame.display.flip()
+        clock.tick(60)
 
 # Xử lý sự kiện khi người chơi click chuột
 def handle_click(board, col, row):
@@ -225,7 +260,6 @@ def handle_click(board, col, row):
 
             # Kiểm tra nếu nước đi là bắt tốt qua đường
             if board.is_en_passant(move):
-                # Xác định vị trí của quân tốt bị bắt
                 en_passant_capture_square = chess.square(col, chess.square_rank(selected_square))
                 captured_piece = board.piece_at(en_passant_capture_square)
                 if captured_piece:
@@ -234,22 +268,14 @@ def handle_click(board, col, row):
             elif captured_piece:  # Kiểm tra nếu có quân cờ bị ăn
                 captured_pieces_list.append(captured_piece.symbol())
 
-            board.push(move)
-            selected_square = None
             previous_move = move
-
-            # Xử lý phong cấp
-            if board.is_checkmate():
-                print("Checkmate!")
-            elif board.is_stalemate():
-                print("Stalemate!")
-            if move.promotion:
-                board.remove_piece_at(move.to_square)
-                board.set_piece_at(move.to_square, chess.Piece(chess.QUEEN, board.turn))
+            selected_square = None
+            return move  # Trả về nước đi để xử lý hoạt ảnh
         else:
             selected_square = None
+    return None  # Không có nước đi hợp lệ
 
-
+# Khởi chạy trò chơi
 def main():
     running = True
     clock = pygame.time.Clock()
@@ -277,7 +303,11 @@ def main():
                 if x < CHESS_BOARD and y < CHESS_BOARD:
                     col = x // SQUARE_SIZE
                     row = 7 - (y // SQUARE_SIZE)
-                    handle_click(board, col, row)
+                    move = handle_click(board, col, row)
+
+                    if move:
+                        animate_move(move, board, screen, pieces, clock)
+                        board.push(move)  # Thực hiện nước đi trên bàn cờ
 
         pygame.display.flip()
         clock.tick(60)
