@@ -28,5 +28,5 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 - chess
 
 ## 4. Đang thử nghiệm Bot và bàn cờ mới
-- phy_test.py: phiên bản thử nghiệm, chưa có tính năng phóng cấp.
+- phy_test.py: phiên bản thử nghiệm, chưa có tính năng phong cấp.
 - AI_test.py: chưa cập nhật.
