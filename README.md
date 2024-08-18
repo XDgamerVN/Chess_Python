@@ -14,9 +14,8 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 
 ### Các file Python
 
-- `main.py`: Chứa các chức năng phụ trợ bổ sung cho trò chơi, có thể bao gồm các tiện ích hoặc các hàm hỗ trợ.
-- `board.py`: Quản lý logic của bàn cờ, bao gồm việc hiển thị và cập nhật trạng thái của bàn cờ khi các quân cờ di chuyển.
-- `constants.py`: Chứa các hằng số được sử dụng trong toàn bộ dự án, như kích thước bàn cờ, màu sắc, hoặc đường dẫn đến các tài nguyên.
+- `Main.py`: Chứa các chức năng phụ trợ bổ sung cho trò chơi, có thể bao gồm các tiện ích hoặc các hàm hỗ trợ.
+- `Constants.py`: Chứa các hằng số được sử dụng trong toàn bộ dự án, như kích thước bàn cờ, màu sắc, hoặc đường dẫn đến các tài nguyên.
 
 
 ## 3. Hướng dẫn cài đặt và sử dụng
