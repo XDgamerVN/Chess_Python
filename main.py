@@ -1,526 +1,362 @@
-import pygame
-from constants import *
-from board import *
-from pieces.queen import check_queen
-from pieces.bishop import check_bishop
-from pieces.knight import check_knight
-from pieces.rook import check_rook
+import pygame as p
+from src import Engine
 
-pygame.init()
+p.init()
 
+CHESS_BOARD = 700
 
-# vẽ các quân cờ lên bảng
-def draw_pieces():
-    # Draw white pieces
-    for i in range(len(white_pieces)):
-        index = piece_list.index(white_pieces[i])
-        if white_pieces[i] == 'pawn':
-            screen.blit(white_pawn, (white_locations[i][0] * 100, white_locations[i][1] * 100))
-        else:
-            screen.blit(white_images[index], (white_locations[i][0] * 100, white_locations[i][1] * 100))
+WIDTH = CHESS_BOARD * 1.6
+HEIGHT = CHESS_BOARD * 1.2
+screen = p.display.set_mode((WIDTH, HEIGHT))
+p.display.set_caption("Chess by Dũng")
+DIMENSION = 8  # Dimensions of a chess board are 8x8
+SQ_SIZE = CHESS_BOARD // DIMENSION
+FPS = 60  # For animations
+images = {}
+captures_images = {}
+PIECE_SIZE = (SQ_SIZE, SQ_SIZE)
+CAPTURED_PIECE_SIZE = (SQ_SIZE // 1.75, SQ_SIZE // 1.75)
+COLOR_BOARD_A = [(235, 236, 208), (115, 149, 82)]
+COLOR_BOARD_Z = [(115, 149, 82), (235, 236, 208)]
 
-        if turn_step < 2:
-            if selection == i:
-                pygame.draw.rect(screen, 'blue', [white_locations[i][0] * 100 + 1, white_locations[i][1] * 100 + 1,
-                                                  100, 100], 5)
+# Tạo font
+font_path = 'Arial'
+small_font = p.font.SysFont(font_path, CHESS_BOARD // 45, False, False)
+medium_font = p.font.SysFont(font_path, CHESS_BOARD // 35, True, False)
+large_font = p.font.SysFont(font_path, CHESS_BOARD // 20, False, False)
 
-    # Draw black pieces
-    for i in range(len(black_pieces)):
-        index = piece_list.index(black_pieces[i])
-        if black_pieces[i] == 'pawn':
-            screen.blit(black_pawn, (black_locations[i][0] * 100, black_locations[i][1] * 100))
-        else:
-            screen.blit(black_images[index], (black_locations[i][0] * 100, black_locations[i][1] * 100))
+def load_images():
+    """Initialize a global dictionary of images"""
+    pieces = ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR', 'bP',
+              'wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR', 'wP']
+    for piece in pieces:
+        images[piece] = (
+            p.transform.smoothscale(p.image.load(f'images/{piece}.png'), PIECE_SIZE))
 
-        if turn_step >= 2:
-            if selection == i:
-                pygame.draw.rect(screen, 'blue', [black_locations[i][0] * 100 + 1, black_locations[i][1] * 100 + 1,
-                                                  100, 100], 5)
+def load_captured_images():
+    """Initialize a global dictionary of images"""
+    pieces = ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR', 'bP',  # Add 'bP'
+              'wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR', 'wP']  # Add 'wP'
+    for piece in pieces:
+        captures_images[piece] = (
+            p.transform.smoothscale(p.image.load(f'images/{piece}.png'), CAPTURED_PIECE_SIZE))
 
-# function to check all pieces valid options on board
-def check_options(pieces, locations, turn):
-    global castling_moves
-    moves_list = []
-    all_moves_list = []
-    castling_moves = []
-    for i in range((len(pieces))):
-        location = locations[i]
-        piece = pieces[i]
-        if piece == 'pawn':
-            moves_list = check_pawn(location, turn)
-        elif piece == 'rook':
-            moves_list = check_rook(location, turn)
-        elif piece == 'knight':
-            moves_list = check_knight(location, turn)
-        elif piece == 'bishop':
-            moves_list = check_bishop(location, turn)
-        elif piece == 'queen':
-            moves_list = check_queen(location, turn)
-        elif piece == 'king':
-            moves_list, castling_moves = check_king(location, turn)
-        all_moves_list.append(moves_list)
-    return all_moves_list
+def draw_game_state(screen, game_state, square_selected, move_log_font):
+    draw_board(screen)  # Vẽ bàn cờ
+    highlight_squares(screen, game_state, square_selected)  # Làm nổi bật ô được chọn và các ô có thể đi được
 
+    # Kiểm tra nếu quân vua bị chiếu và thêm viền đỏ
+    '''if game_state.in_check:
+        king_position = game_state.find_king(game_state.white_to_move)  # Lấy vị trí của vua
+        highlight_king_in_check(screen, king_position)'''  # Vẽ viền đỏ quanh vua
 
-# check king valid moves
-def check_king(position, color):
-    """
-    Hàm kiểm tra các nước đi hợp lệ của quân vua dựa trên vị trí hiện tại và màu sắc,
-    bao gồm cả các nước nhập thành.
+    draw_pieces(screen, game_state.board)  # Vẽ các quân cờ trên bàn cờ
+    draw_captured_pieces(screen, game_state.captured_pieces)  # Vẽ các quân cờ đã bị ăn
 
-    Parameters:
-    - position: tuple chứa tọa độ hiện tại của quân vua (x, y).
-    - color: chuỗi 'white' hoặc 'black' để xác định màu của quân vua.
+    # Hiển thị các nước đi hợp lệ
+    if square_selected != ():
+        row, col = square_selected
+        piece = game_state.board[row][col]
+        if (piece[0] == 'w' and game_state.white_to_move) or (piece[0] == 'b' and not game_state.white_to_move):
+            valid_moves = game_state.get_valid_moves()
+            highlight_valid_moves(screen, game_state, valid_moves, square_selected)
 
-    Returns:
-    - moves_list: danh sách các tọa độ mà quân vua có thể di chuyển đến.
-    - castle_moves: danh sách các nước nhập thành hợp lệ.
-    """
-    moves_list = []
-    castle_moves = check_castling()  # Kiểm tra các nước nhập thành hợp lệ
+    draw_move_log(screen, game_state, move_log_font)  # Vẽ lịch sử các nước đi
 
-    # Xác định danh sách quân đồng minh dựa trên màu sắc của quân vua
-    friends_list = white_locations if color == 'white' else black_locations
+def draw_board(screen):
+    """Draw squares on the board using a chess.com colouring pattern"""
+    for row in range(DIMENSION):
+        for column in range(DIMENSION):
+            colour = COLOR_BOARD_A[((row + column) % 2)]
+            p.draw.rect(screen, colour, p.Rect(column * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+    # Vẽ chữ hàng
+    for i in range(DIMENSION):
+        color = COLOR_BOARD_A[(i % 2)]
+        text = medium_font.render(chr(ord('a') + i), True, color)
+        screen.blit(text, (SQ_SIZE * 0.86 + i * SQ_SIZE, SQ_SIZE * 7.7))
+    # Vẽ chữ cột
+    for i in range(DIMENSION):
+        color = COLOR_BOARD_Z[(i % 2)]
+        text = medium_font.render(str(8 - i), True, color)
+        screen.blit(text, (SQ_SIZE * 0.05, SQ_SIZE // 25 + i * SQ_SIZE))
+    p.draw.rect(screen, 'grey22', p.Rect(SQ_SIZE // 100, SQ_SIZE * 8.2,
+                                         SQ_SIZE * 8, SQ_SIZE // 1.75), 2)
+    p.draw.rect(screen, 'grey22', p.Rect(SQ_SIZE // 100, SQ_SIZE * 8.8,
+                                         SQ_SIZE * 8, SQ_SIZE // 1.75), 2)
 
-    # Các nước đi hợp lệ cho vua: vua có thể di chuyển một ô theo bất kỳ hướng nào
-    targets = [(1, 0), (1, 1), (1, -1), (-1, 0), (-1, 1), (-1, -1), (0, 1), (0, -1)]
+def draw_pieces(screen, board):
+    """Draws pieces on the board using the current GameState.board"""
+    for row in range(DIMENSION):
+        for column in range(DIMENSION):
+            piece = board[row][column]
+            if piece != '--':  # Add pieces if not an empty square
+                screen.blit(images[piece], p.Rect(column * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-    for dx, dy in targets:
-        target = (position[0] + dx, position[1] + dy)
-        # Kiểm tra xem vị trí di chuyển có nằm trong giới hạn bàn cờ và không có quân đồng minh
-        if target not in friends_list and 0 <= target[0] <= 7 and 0 <= target[1] <= 7:
-            moves_list.append(target)
+def draw_captured_pieces(screen, captured_pieces):
+    """Vẽ các quân cờ đã bị ăn theo hàng ngang, quân trắng nằm trên, quân đen nằm dưới"""
+    white_captures = [p for p in captured_pieces if p[0] == 'w']
+    black_captures = [p for p in captured_pieces if p[0] == 'b']
 
-    return moves_list, castle_moves
+    # Vẽ quân cờ trắng đã bị ăn (hàng trên)
+    for i, piece in enumerate(white_captures):
+        piece_image = captures_images.get(piece)
+        if piece_image:
+            screen.blit(piece_image, (SQ_SIZE // 100 + i * SQ_SIZE // 2, SQ_SIZE * 8.2))
 
+    # Vẽ quân cờ đen đã bị ăn (hàng dưới)
+    for i, piece in enumerate(black_captures):
+        piece_image = captures_images.get(piece)
+        if piece_image:
+            screen.blit(piece_image, (SQ_SIZE // 100 + i * SQ_SIZE // 2, SQ_SIZE * 8.8))
 
-# check valid pawn moves
-def check_pawn(position, color):
-    """
-    Hàm kiểm tra các nước đi hợp lệ của quân tốt dựa trên vị trí hiện tại và màu sắc.
+def promote_pawn(screen, piece_color):
+    """Creates a window for pawn promotion, allowing the player to choose a piece for promotion"""
+    # Define the dimensions for the promotion window
+    promote_window_width = 4 * SQ_SIZE
+    promote_window_height = SQ_SIZE
+    promote_window = p.Surface((promote_window_width, promote_window_height))
+    promote_window.fill(p.Color("black"))
 
-    Parameters:
-    - position: tuple chứa tọa độ hiện tại của quân tốt (x, y).
-    - color: chuỗi 'white' hoặc 'black' để xác định màu của quân tốt.
+    # Load images for promotion pieces
+    piece_images = {}
+    pieces = ['wQ', 'wR', 'wB', 'wN'] if piece_color == 'w' else ['bQ', 'bR', 'bB', 'bN']
 
-    Returns:
-    - moves_list: danh sách các tọa độ mà quân tốt có thể di chuyển đến.
-    """
-    moves_list = []
-    direction = 1 if color == 'white' else -1  # Xác định hướng di chuyển dựa trên màu sắc (trắng đi lên, đen đi xuống)
-    start_row = 1 if color == 'white' else 6  # Hàng khởi đầu của tốt (trắng ở hàng 1, đen ở hàng 6)
-    enemies_list = black_locations if color == 'white' else white_locations  # Danh sách quân địch
-    friends_list = white_locations if color == 'white' else black_locations  # Danh sách quân cùng màu
-    ep_target = black_ep if color == 'white' else white_ep  # Mục tiêu bắt tốt qua đường (en passant)
+    for piece in pieces:
+        try:
+            piece_images[piece] = p.transform.smoothscale(p.image.load(f'images/{piece}.png'), PIECE_SIZE)
+        except FileNotFoundError:
+            print(f"Error: Image file for {piece} not found.")
+            piece_images[piece] = p.Surface((SQ_SIZE, SQ_SIZE))  # Placeholder if image not found
 
-    # Kiểm tra di chuyển một ô về phía trước
-    forward_one = (position[0], position[1] + direction)
-    if forward_one not in friends_list and forward_one not in enemies_list and 0 <= forward_one[1] <= 7:
-        moves_list.append(forward_one)
+    # Draw the pieces onto the promotion window
+    for idx, piece in enumerate(pieces):
+        piece_image = piece_images[piece]
+        promote_window.blit(piece_image, p.Rect(idx * SQ_SIZE, 0, SQ_SIZE, SQ_SIZE))
 
-        # Kiểm tra di chuyển hai ô về phía trước từ vị trí khởi đầu
-        if position[1] == start_row:
-            forward_two = (position[0], position[1] + 2 * direction)
-            if forward_two not in friends_list and forward_two not in enemies_list:
-                moves_list.append(forward_two)
+    # Display the promotion window on the main screen
+    window_x = SQ_SIZE * 8
+    window_y = SQ_SIZE // 100
+    screen.blit(promote_window, (window_x, window_y))
+    p.display.flip()
 
-    # Kiểm tra ăn quân địch chéo sang trái và phải
-    for dx in [-1, 1]:
-        diagonal = (position[0] + dx, position[1] + direction)
-        if diagonal in enemies_list or diagonal == ep_target:  # Kiểm tra bắt qua đường (en passant)
-            moves_list.append(diagonal)
+    # Wait for the player to select a piece
+    selected_piece = None
+    while selected_piece is None:
+        for e in p.event.get():
+            if e.type == p.MOUSEBUTTONDOWN:
+                x, y = e.pos
+                if window_x <= x <= window_x + promote_window_width and window_y <= y <= window_y + promote_window_height:
+                    selected_index = (x - window_x) // SQ_SIZE
+                    if 0 <= selected_index < len(pieces):
+                        selected_piece = pieces[selected_index]
+                        break
 
-    return moves_list
+    # Clear the promotion window by redrawing the main game state
+    screen.fill(p.Color("dark grey"))  # Assuming white is the background color of the main screen
+    p.display.flip()
 
+    return selected_piece
 
-# check for valid moves for just selected piece
-def check_valid_moves():
-    if turn_step < 2:
-        options_list = white_options
-    else:
-        options_list = black_options
-    valid_options = options_list[selection]
-    return valid_options
+def highlight_king_in_check(screen, king_position):
+    """Hàm vẽ viền đỏ quanh quân vua khi bị chiếu"""
+    row, col = king_position
+    s = p.Surface((SQ_SIZE, SQ_SIZE))
+    s.set_alpha(100)  # Độ trong suốt
+    s.fill(p.Color('red'))  # Màu đỏ
+    screen.blit(s, (col * SQ_SIZE, row * SQ_SIZE))
 
+def highlight_squares(screen, game_state, square_selected):
+    """Highlights square selected and last move made"""
+    # Highlights selected square
+    if square_selected != ():
+        row, column = square_selected
+        if game_state.board[row][column][0] == ('w' if game_state.white_to_move else 'b'):  # Clicks on own piece
+            s = p.Surface((SQ_SIZE, SQ_SIZE))
+            s.set_alpha(70)  # Transperancy value; 0 transparent; 255 opaque
+            s.fill(p.Color('blue'))
+            screen.blit(s, (column * SQ_SIZE, row * SQ_SIZE))
 
-# draw valid moves on screen
-def draw_valid(moves):
-    for i in range(len(moves)):
-        pygame.draw.circle(screen, 'blue', (moves[i][0] * 100 + 50, moves[i][1] * 100 + 50), 5)
+    # Highlights last move
+    if len(game_state.move_log) != 0:
+        last_move = game_state.move_log[-1]
+        start_row, start_column = last_move.start_row, last_move.start_column
+        end_row, end_column = last_move.end_row, last_move.end_column
+        s = p.Surface((SQ_SIZE, SQ_SIZE))
+        s.set_alpha(70)
+        s.fill(p.Color('yellow'))
+        screen.blit(s, (start_column * SQ_SIZE, start_row * SQ_SIZE))
+        screen.blit(s, (end_column * SQ_SIZE, end_row * SQ_SIZE))
 
+def highlight_valid_moves(screen, game_state, valid_moves, square_selected):
+    """Vẽ các nước đi hợp lệ khi người chơi chọn một quân cờ"""
+    for move in valid_moves:
+        if move.start_row == square_selected[0] and move.start_column == square_selected[1]:
+            s = p.Surface((SQ_SIZE, SQ_SIZE), p.SRCALPHA)
+            s.set_alpha(100)  # Độ trong suốt
+            p.draw.circle(s, 'blue', (SQ_SIZE // 2, SQ_SIZE // 2), SQ_SIZE // 6)
+            screen.blit(s, (move.end_column * SQ_SIZE, move.end_row * SQ_SIZE))
 
-# draw captured pieces on side of screen
-def draw_captured():
-    for i in range(len(captured_pieces_white)):
-        captured_piece = captured_pieces_white[i]
-        index = piece_list.index(captured_piece)
-        screen.blit(small_black_images[index], (825, 5 + 50 * i))
-    for i in range(len(captured_pieces_black)):
-        captured_piece = captured_pieces_black[i]
-        index = piece_list.index(captured_piece)
-        screen.blit(small_white_images[index], (925, 5 + 50 * i))
+def draw_move_log(screen, game_state, font):
+    """Draws move log to the right of the screen"""
+    move_log_area = p.Rect(SQ_SIZE * 8, SQ_SIZE * 3, SQ_SIZE * 5, SQ_SIZE * 5)
+    p.draw.rect(screen, p.Color('grey22'), move_log_area)
+    move_log = game_state.move_log
+    move_texts = []
+    for i in range(0, len(move_log), 2):
+        move_string = f'{i // 2 + 1}. {str(move_log[i])} '
+        if i + 1 < len(move_log):  # Makes sure black has made a move
+            move_string += f'{str(move_log[i + 1])} '
+        move_texts.append(move_string)
 
+    move_padding = 5
+    text_y = move_padding
+    for j in range(0, len(move_texts), 5):
+        text_line = ' | '.join(move_texts[j:j + 5])  # Ghi lại 5 lượt đi chung trên 1 dòng
+        text_object = small_font.render(text_line, True, p.Color('white'))
+        text_location = move_log_area.move(move_padding, text_y)
+        screen.blit(text_object, text_location)
+        text_y += text_object.get_height()
 
-# draw a flashing square around king if in check
-def draw_check():
-    """
-    Hàm kiểm tra xem vua có đang bị chiếu (check) hay không và vẽ khung xung quanh vua nếu bị chiếu.
+def animate_move(move, screen, board, clock):
+    """Animates a move"""
+    delta_row = move.end_row - move.start_row  # Change in row
+    delta_column = move.end_column - move.start_column  # Change in column
+    frames_per_square = 5  # Controls animation speed (frames to move one square)
+    frame_count = (abs(delta_row) + abs(delta_column)) * frames_per_square
 
-    Các biến toàn cục:
-    - check: cờ đánh dấu trạng thái chiếu.
-    - turn_step: bước đi hiện tại trong trò chơi (dùng để xác định lượt đi của trắng hoặc đen).
-    - white_pieces, black_pieces: danh sách các quân cờ trắng và đen.
-    - white_locations, black_locations: vị trí của các quân cờ trắng và đen.
-    - white_options, black_options: các nước đi có thể của quân trắng và đen.
-    - screen: màn hình trò chơi.
-    - counter: biến đếm để tạo hiệu ứng nhấp nháy khi bị chiếu.
-    """
-    global check
-    check = False  # Đặt lại cờ check trước mỗi lần kiểm tra
+    for frame in range(frame_count + 1):  # Need +1 to complete the entire animation
 
-    if turn_step < 2:  # Lượt đi của quân trắng
-        if 'king' in white_pieces:
-            king_index = white_pieces.index('king')
-            king_location = white_locations[king_index]
+        #  Frame/frame_count indicates how far along the action is
+        row, column = (
+            move.start_row + delta_row * frame / frame_count, move.start_column + delta_column * frame / frame_count)
 
-            # Kiểm tra nếu vua trắng bị chiếu
-            for options in black_options:
-                if king_location in options:
-                    check = True
-                    if counter < 15:  # Tạo hiệu ứng nhấp nháy trong 15 lần đầu
-                        pygame.draw.rect(screen, 'red', [king_location[0] * 100 + 1,
-                                                              king_location[1] * 100 + 1, 100, 100], 5)
-    else:  # Lượt đi của quân đen
-        if 'king' in black_pieces:
-            king_index = black_pieces.index('king')
-            king_location = black_locations[king_index]
+        # Draw board and pieces for each frame of the animation
+        draw_board(screen)
+        draw_pieces(screen, board)
 
-            # Kiểm tra nếu vua đen bị chiếu
-            for options in white_options:
-                if king_location in options:
-                    check = True
-                    if counter < 15:  # Tạo hiệu ứng nhấp nháy trong 15 lần đầu
-                        pygame.draw.rect(screen, 'red', [king_location[0] * 100 + 1,
-                                                               king_location[1] * 100 + 1, 100, 100], 5)
+        # Erases the piece from its ending square
+        colour = COLOR_BOARD_A[(move.end_row + move.end_column) % 2]
+        end_square = p.Rect(move.end_column * SQ_SIZE, move.end_row * SQ_SIZE, SQ_SIZE, SQ_SIZE)
+        p.draw.rect(screen, colour, end_square)
 
+        # Draws a captured piece onto the rectangle if a piece is captured
+        if move.piece_captured != '--':
+            if move.is_en_passant_move:
+                en_passant_row = move.end_row + 1 if move.piece_captured[0] == 'b' else move.end_row - 1
+                end_square = p.Rect(move.end_column * SQ_SIZE, en_passant_row * SQ_SIZE, SQ_SIZE, SQ_SIZE)
+            screen.blit(images[move.piece_captured], end_square)
 
-def draw_game_over():
-    pygame.draw.rect(screen, 'black', [200, 200, 400, 70])
-    screen.blit(font.render(f'{winner} won the game!', True, 'white'), (210, 210))
-    screen.blit(font.render(f'Press ENTER to Restart!', True, 'white'), (210, 240))
+        # Draws moving piece
+        screen.blit(images[move.piece_moved], p.Rect(column * SQ_SIZE, row * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
+        p.display.flip()
+        clock.tick(60)  # Controls fame rate per second for the animation
 
-# check en passant because people on the internet won't stop bugging me for it
-def check_ep(old_coords, new_coords):
-    if turn_step <= 1:
-        index = white_locations.index(old_coords)
-        ep_coords = (new_coords[0], new_coords[1] - 1)
-        piece = white_pieces[index]
-    else:
-        index = black_locations.index(old_coords)
-        ep_coords = (new_coords[0], new_coords[1] + 1)
-        piece = black_pieces[index]
-    if piece == 'pawn' and abs(old_coords[1] - new_coords[1]) > 1:
-        # if piece was pawn and moved two spaces, return EP coords as defined above
-        pass
-    else:
-        ep_coords = (100, 100)
-    return ep_coords
+def draw_endgame_text(screen, text):
+    """Vẽ văn bản khi kết thúc trò chơi"""
+    text_object = large_font.render(text, True, p.Color('gray'), p.Color('mintcream'))
+    text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(SQ_SIZE * 8 - text_object.get_width() / 2,
+                                                     SQ_SIZE * 2 - text_object.get_height() / 2)
+    screen.blit(text_object, text_location)
 
+    # Creates a shadowing effect
+    text_object = large_font.render(text, True, p.Color('black'))
+    screen.blit(text_object, text_location.move(2, 2))
 
-# add castling
-def check_castling():
-    # king must not currently be in check, neither the rook nor king has moved previously, nothing between
-    # and the king does not pass through or finish on an attacked piece
-    castle_moves = []  # store each valid castle move as [((king_coords), (castle_coords))]
-    rook_indexes = []
-    rook_locations = []
-    king_index = 0
-    king_pos = (0, 0)
-    if turn_step > 1:
-        for i in range(len(white_pieces)):
-            if white_pieces[i] == 'rook':
-                rook_indexes.append(white_moved[i])
-                rook_locations.append(white_locations[i])
-            if white_pieces[i] == 'king':
-                king_index = i
-                king_pos = white_locations[i]
-        if not white_moved[king_index] and False in rook_indexes and not check:
-            for i in range(len(rook_indexes)):
-                castle = True
-                if rook_locations[i][0] > king_pos[0]:
-                    empty_squares = [(king_pos[0] + 1, king_pos[1]),
-                                     (king_pos[0] + 2, king_pos[1]),
-                                     (king_pos[0] + 3, king_pos[1])]
-                else:
-                    empty_squares = [(king_pos[0] - 1, king_pos[1]),
-                                     (king_pos[0] - 2, king_pos[1])]
-                for j in range(len(empty_squares)):
-                    if empty_squares[j] in white_locations or empty_squares[j] in black_locations or \
-                            empty_squares[j] in black_options or rook_indexes[i]:
-                        castle = False
-                if castle:
-                    castle_moves.append((empty_squares[1], empty_squares[0]))
-    else:
-        for i in range(len(black_pieces)):
-            if black_pieces[i] == 'rook':
-                rook_indexes.append(black_moved[i])
-                rook_locations.append(black_locations[i])
-            if black_pieces[i] == 'king':
-                king_index = i
-                king_pos = black_locations[i]
-        if not black_moved[king_index] and False in rook_indexes and not check:
-            for i in range(len(rook_indexes)):
-                castle = True
-                if rook_locations[i][0] > king_pos[0]:
-                    empty_squares = [(king_pos[0] + 1, king_pos[1]),
-                                     (king_pos[0] + 2, king_pos[1]),
-                                     (king_pos[0] + 3, king_pos[1])]
-                else:
-                    empty_squares = [(king_pos[0] - 1, king_pos[1]),
-                                     (king_pos[0] - 2, king_pos[1])]
-                for j in range(len(empty_squares)):
-                    if empty_squares[j] in white_locations or empty_squares[j] in black_locations or \
-                            empty_squares[j] in white_options or rook_indexes[i]:
-                        castle = False
-                if castle:
-                    castle_moves.append((empty_squares[1], empty_squares[0]))
-    return castle_moves
+def main():
+    """Main function which handles user input and updates graphics"""
+    clock = p.time.Clock()
+    screen.fill(p.Color('dark grey'))
+    game_state = Engine.GameState()
+    valid_moves = game_state.get_valid_moves()
+    move_made = False  # Flag variable for when a move is made
+    animate = False  # Flag variable for when a move should be animated
+    load_images()
+    load_captured_images()
+    running = True
+    square_selected = ()  # Keeps track of the last click by user (tuple: (row, column))
+    player_clicks = []  # Keeps track of player clicks (two tuples: ex. [(6, 4), (4, 4)])
+    game_over = False
 
+    while running:
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                running = False
 
-def draw_castling(moves):
-    for i in range(len(moves)):
-        pygame.draw.circle(screen, 'red', (moves[i][0][0] * 100 + 50, moves[i][0][1] * 100 + 70), 8)
-        screen.blit(font.render('king', True, 'black'), (moves[i][0][0] * 100 + 30, moves[i][0][1] * 100 + 70))
-        pygame.draw.circle(screen, 'red', (moves[i][1][0] * 100 + 50, moves[i][1][1] * 100 + 70), 8)
-        screen.blit(font.render('rook', True, 'black'),
-                    (moves[i][1][0] * 100 + 30, moves[i][1][1] * 100 + 70))
-        pygame.draw.line(screen, 'red', (moves[i][0][0] * 100 + 50, moves[i][0][1] * 100 + 70),
-                         (moves[i][1][0] * 100 + 50, moves[i][1][1] * 100 + 70), 2)
+            # Mouse handler
+            elif event.type == p.MOUSEBUTTONDOWN:
+                if not game_over:
+                    location = p.mouse.get_pos()  # (x, y) location of mouse
+                    column = location[0] // SQ_SIZE
+                    row = location[1] // SQ_SIZE
+                    if square_selected == (row, column) or column >= DIMENSION:  # User clicks same square or move log
+                        square_selected = ()  # Deselects
+                        player_clicks = []  # Clears player clicks
+                    else:
+                        square_selected = (row, column)
+                        player_clicks.append(square_selected)  # Appends both 1st and 2nd clicks
+                    if len(player_clicks) == 2:
+                        move = Engine.Move(player_clicks[0], player_clicks[1], game_state.board)
+                        for i in range(len(valid_moves)):
+                            if move == valid_moves[i]:
+                                game_state.make_move(valid_moves[i])
+                                move_made = True
+                                animate = True
+                                square_selected = ()  # Resets user clicks
+                                player_clicks = []
+                        if not move_made:
+                            player_clicks = [square_selected]
 
+            # Key handlers
+            elif event.type == p.KEYDOWN:
+                if event.key == p.K_z:  # Undo move when 'z' is pressed
+                    game_state.undo_move()
+                    move_made = True
+                    animate = False
+                    game_over = False
+                if event.key == p.K_r:  # Reset board when 'r' is pressed
+                    game_state = Engine.GameState()
+                    valid_moves = game_state.get_valid_moves()
+                    square_selected = ()
+                    player_clicks = []
+                    move_made = False
+                    animate = False
+                    game_over = False
 
-# add pawn promotion
-def check_promotion():
-    pawn_indexes = []
-    white_promotion = False
-    black_promotion = False
-    promote_index = 100
-    for i in range(len(white_pieces)):
-        if white_pieces[i] == 'pawn':
-            pawn_indexes.append(i)
-    for i in range(len(pawn_indexes)):
-        if white_locations[pawn_indexes[i]][1] == 7:
-            white_promotion = True
-            promote_index = pawn_indexes[i]
-    pawn_indexes = []
-    for i in range(len(black_pieces)):
-        if black_pieces[i] == 'pawn':
-            pawn_indexes.append(i)
-    for i in range(len(pawn_indexes)):
-        if black_locations[pawn_indexes[i]][1] == 0:
-            black_promotion = True
-            promote_index = pawn_indexes[i]
-    return white_promotion, black_promotion, promote_index
+        if move_made:
+            if animate:
+                animate_move(game_state.move_log[-1], screen, game_state.board, clock)
+            valid_moves = game_state.get_valid_moves()
 
+            # Kiểm tra phong cấp quân tốt sau khi di chuyển
+            last_move = game_state.move_log[-1]
+            if last_move.piece_moved in ['wP', 'bP'] and (last_move.end_row == 0 or last_move.end_row == 7):
+                piece_color = last_move.piece_moved[0]
+                # Xử lý quân bị ăn
+                if last_move.piece_captured != '--':
+                    # Đảm bảo quân bị ăn đã xuất hiện trong danh sách quân bị ăn
+                    if last_move.piece_captured in game_state.captured_pieces:
+                        game_state.captured_pieces.append(last_move.piece_captured)  # Thêm quân bị ăn vào danh sách
+                # Sau khi quân bị ăn được xử lý và thêm vào danh sách quân bị ăn
+                promoted_piece = promote_pawn(screen, piece_color)
+                end_col = last_move.end_col if hasattr(last_move, 'end_col') else last_move.start_col
+                game_state.board[last_move.end_row][end_col] = promoted_piece  # Sửa lỗi ở đây
 
-def draw_promotion():
-    pygame.draw.rect(screen, 'dark gray', [800, 0, 200, 420])
-    if white_promote:
-        color = 'white'
-        for i in range(len(white_promotions)):
-            piece = white_promotions[i]
-            index = piece_list.index(piece)
-            screen.blit(white_images[index], (860, 5 + 100 * i))
-    elif black_promote:
-        color = 'black'
-        for i in range(len(black_promotions)):
-            piece = black_promotions[i]
-            index = piece_list.index(piece)
-            screen.blit(black_images[index], (860, 5 + 100 * i))
-    pygame.draw.rect(screen, color, [800, 0, 200, 420], 8)
+            move_made = False
+            animate = False
 
+        draw_game_state(screen, game_state, square_selected, large_font)
 
-def check_promo_select():
-    mouse_pos = pygame.mouse.get_pos()
-    left_click = pygame.mouse.get_pressed()[0]
-    x_pos = mouse_pos[0] // 100
-    y_pos = mouse_pos[1] // 100
-    if white_promote and left_click and x_pos > 7 and y_pos < 4:
-        white_pieces[promo_index] = white_promotions[y_pos]
-    elif black_promote and left_click and x_pos > 7 and y_pos < 4:
-        black_pieces[promo_index] = black_promotions[y_pos]
+        if game_state.checkmate or game_state.stalemate:
+            game_over = True
+            if game_state.stalemate:
+                text = 'Stalemate'
+            else:
+                text = 'Black wins by checkmate' if game_state.white_to_move else 'White wins by checkmate'
+            draw_endgame_text(screen, text)
 
-# Draw yellow rectangles for old and new positions (only once)
-def draw_move_indicator(old_pos, new_pos):
-    if new_pos and old_pos:
-        pygame.draw.rect(screen, 'yellow', [old_pos[0], old_pos[1], 100, 100], 5)
-        pygame.draw.rect(screen, 'yellow', [new_pos[0], new_pos[1], 100, 100], 5)
+        clock.tick(FPS)
+        p.display.flip()
 
-# main game loop
-black_options = check_options(black_pieces, black_locations, 'black')
-white_options = check_options(white_pieces, white_locations, 'white')
-old_pos = None
-new_pos = None
-run = True
-while run:
-    timer.tick(fps)
-    if counter < 30:
-        counter += 1
-    else:
-        counter = 0
-    screen.fill('dark gray')
-    draw_board()
-    draw_pieces()
-    draw_captured()
-    draw_check()
-    if not game_over:
-        white_promote, black_promote, promo_index = check_promotion()
-        if white_promote or black_promote:
-            draw_promotion()
-            check_promo_select()
-    if selection != 100:
-        valid_moves = check_valid_moves()
-        draw_valid(valid_moves)
-        if selected_piece == 'king':
-            draw_castling(castling_moves)
-    # event handling
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_over:
-            x_coord = event.pos[0] // 100
-            y_coord = event.pos[1] // 100
-            click_coords = (x_coord, y_coord)
-            if turn_step <= 1:
-                if click_coords == (8, 8) or click_coords == (9, 8):
-                    winner = 'black'
-                if click_coords in white_locations:
-                    selection = white_locations.index(click_coords)
-                    # check what piece is selected, so you can only draw castling moves if king is selected
-                    selected_piece = white_pieces[selection]
-                    if turn_step == 0:
-                        turn_step = 1
-                if click_coords in valid_moves and selection != 100:
-                    white_ep = check_ep(white_locations[selection], click_coords)
-                    white_locations[selection] = click_coords
-                    white_moved[selection] = True
-                    if click_coords in black_locations:
-                        black_piece = black_locations.index(click_coords)
-                        captured_pieces_white.append(black_pieces[black_piece])
-                        if black_pieces[black_piece] == 'king':
-                            winner = 'white'
-                        black_pieces.pop(black_piece)
-                        black_locations.pop(black_piece)
-                        black_moved.pop(black_piece)
-                    # adding check if en passant pawn was captured
-                    if click_coords == black_ep:
-                        black_piece = black_locations.index((black_ep[0], black_ep[1] - 1))
-                        captured_pieces_white.append(black_pieces[black_piece])
-                        black_pieces.pop(black_piece)
-                        black_locations.pop(black_piece)
-                        black_moved.pop(black_piece)
-                    black_options = check_options(black_pieces, black_locations, 'black')
-                    white_options = check_options(white_pieces, white_locations, 'white')
-                    turn_step = 2
-                    selection = 100
-                    valid_moves = []
-                # add option to castle
-                elif selection != 100 and selected_piece == 'king':
-                    for q in range(len(castling_moves)):
-                        # check if the click is in the castling moves
-                        if q < len(castling_moves) and click_coords == castling_moves[q][0]:
-                            white_locations[selection] = click_coords
-                            white_moved[selection] = True
-                            if click_coords == (1, 0):
-                                rook_coords = (0, 0)
-                            else:
-                                rook_coords = (7, 0)
-                            rook_index = white_locations.index(rook_coords)
-                            white_locations[rook_index] = castling_moves[q][1]
-                            black_options = check_options(black_pieces, black_locations, 'black')
-                            white_options = check_options(white_pieces, white_locations, 'white')
-                            turn_step = 2
-                            selection = 100
-                            valid_moves = []
-            if turn_step > 1:
-                if click_coords == (8, 8) or click_coords == (9, 8):
-                    winner = 'white'
-                if click_coords in black_locations:
-                    selection = black_locations.index(click_coords)
-                    # check what piece is selected, so you can only draw castling moves if king is selected
-                    selected_piece = black_pieces[selection]
-                    if turn_step == 2:
-                        turn_step = 3
-                if click_coords in valid_moves and selection != 100:
-                    black_ep = check_ep(black_locations[selection], click_coords)
-                    black_locations[selection] = click_coords
-                    black_moved[selection] = True
-                    if click_coords in white_locations:
-                        white_piece = white_locations.index(click_coords)
-                        captured_pieces_black.append(white_pieces[white_piece])
-                        if white_pieces[white_piece] == 'king':
-                            winner = 'black'
-                        white_pieces.pop(white_piece)
-                        white_locations.pop(white_piece)
-                        white_moved.pop(white_piece)
-                    if click_coords == white_ep:
-                        white_piece = white_locations.index((white_ep[0], white_ep[1] + 1))
-                        captured_pieces_black.append(white_pieces[white_piece])
-                        white_pieces.pop(white_piece)
-                        white_locations.pop(white_piece)
-                        white_moved.pop(white_piece)
-                    black_options = check_options(black_pieces, black_locations, 'black')
-                    white_options = check_options(white_pieces, white_locations, 'white')
-                    turn_step = 0
-                    selection = 100
-                    valid_moves = []
-                # add option to castle
-                elif selection != 100 and selected_piece == 'king':
-                    for q in range(len(castling_moves)):
-                        # check if the click is in the castling moves
-                        if q < len(castling_moves) and click_coords == castling_moves[q][0]:
-                            # check if the click is in the castling moves
-                            black_locations[selection] = click_coords
-                            black_moved[selection] = True
-                            if click_coords == (1, 7):
-                                rook_coords = (0, 7)
-                            else:
-                                rook_coords = (7, 7)
-                            rook_index = black_locations.index(rook_coords)
-                            black_locations[rook_index] = castling_moves[q][1]
-                            black_options = check_options(black_pieces, black_locations, 'black')
-                            white_options = check_options(white_pieces, white_locations, 'white')
-                            turn_step = 0
-                            selection = 100
-                            valid_moves = []
-        if event.type == pygame.KEYDOWN and game_over:
-            if event.key == pygame.K_RETURN:
-                game_over = False
-                winner = ''
-                white_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
-                                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
-                white_locations = [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
-                                   (0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1)]
-                white_moved = [False, False, False, False, False, False, False, False,
-                               False, False, False, False, False, False, False, False]
-                black_pieces = ['rook', 'knight', 'bishop', 'king', 'queen', 'bishop', 'knight', 'rook',
-                                'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn', 'pawn']
-                black_locations = [(0, 7), (1, 7), (2, 7), (3, 7), (4, 7), (5, 7), (6, 7), (7, 7),
-                                   (0, 6), (1, 6), (2, 6), (3, 6), (4, 6), (5, 6), (6, 6), (7, 6)]
-                black_moved = [False, False, False, False, False, False, False, False,
-                               False, False, False, False, False, False, False, False]
-                captured_pieces_white = []
-                captured_pieces_black = []
-                turn_step = 0
-                selection = 100
-                valid_moves = []
-                black_options = check_options(black_pieces, black_locations, 'black')
-                white_options = check_options(white_pieces, white_locations, 'white')
-
-
-    if winner != '':
-        game_over = True
-        draw_game_over()
-
-    pygame.display.flip()
-pygame.quit()
+if __name__ == '__main__':
+    main()
