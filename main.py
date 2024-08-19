@@ -1,5 +1,5 @@
 import pygame as p
-from src import Engine
+from Chess_py import Engine
 
 p.init()
 
