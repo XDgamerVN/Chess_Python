@@ -8,24 +8,20 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 
 Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự án:
 
-- `assets/`: Thư mục chứa các tài nguyên cần thiết cho trò chơi như hình ảnh quân cờ dạng PNG.
-    + `pieces/`: Thư mục chứa các hình ảnh của quân cờ trong trò chơi.
-- `test/`: Thư mục dùng để lưu trữ dữ liệu thử nghiệm, có thể bao gồm các file test hoặc mẫu dữ liệu cho việc phát triển và kiểm thử. (Đang thử nghiệm chess test/phy_test.py)
+- `NewChess/`: thư mục chính chứ tệp chính
+- `images/`: Thư mục chứa các tài nguyên hình ảnh quân cờ dạng PNG.
 
 ### Các file Python
 
-- `Main.py`: Chứa các chức năng phụ trợ bổ sung cho trò chơi, có thể bao gồm các tiện ích hoặc các hàm hỗ trợ.
-- `Constants.py`: Chứa các hằng số được sử dụng trong toàn bộ dự án, như kích thước bàn cờ, màu sắc, hoặc đường dẫn đến các tài nguyên.
+- `Main.py`: Chứa các chức năng chính của trò chơi (chưa được tối ưu).
+- `Engine.py`: Chứa các thư viên trò chơi cờ vua (chưa được tối ưu).
 
+## 3. Thử nghiệm
+- `ChessAI.py`: máy chơi cờ (chưa co file)
 
-## 3. Hướng dẫn cài đặt và sử dụng
+## 4. Hướng dẫn cài đặt và sử dụng
 
 ### Yêu cầu hệ thống
 
 - Python 3.x
 - pygame
-- chess
-
-## 4. Đang thử nghiệm Bot và bàn cờ mới
-- phy_test.py: phiên bản thử nghiệm, chưa có tính năng phong cấp.
-- AI_test.py: chưa cập nhật.
