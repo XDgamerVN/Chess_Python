@@ -21,7 +21,8 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 
 ## 4. Hướng dẫn cài đặt và sử dụng
 
-### Yêu cầu hệ thống
+### Yêu cầu hệ thống (Khuyên dùng với Pycharm)
 
-- Python 3.11.x
+- Python 3.1x.x
 - pygame 2.0.6
+- SDL 2.2x.x
