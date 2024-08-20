@@ -25,4 +25,3 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 
 - Python 3.1x.x
 - pygame 2.0.6
-- SDL 2.2x.x
