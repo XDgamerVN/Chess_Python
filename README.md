@@ -6,15 +6,13 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 
 ## 2. Cấu trúc dự án
 
-Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự án:
-
 - `images/`: Thư mục chứa các tài nguyên hình ảnh quân cờ dạng PNG.
 
-### Các file Python
+### Các file Python (chưa được tối ưu)
 
-- `Main.py`: Chứa các chức năng chính của trò chơi (chưa được tối ưu).
-- `Engine.py`: Chứa các thư viên trò chơi cờ vua (chưa được tối ưu).
-- `Constants.py`: Chứa các tỉ lệ hiển thị
+- `Main.py`: Chứa các chức năng chính của trò chơi.
+- `Engine.py`: Chứa các thư viên trò chơi cờ vua.
+- `Constants.py`: Chứa các tỉ lệ hiển thị.
 
 ## 3. Thử nghiệm
 - `ChessAI.py`: máy chơi cờ (chưa co file)
