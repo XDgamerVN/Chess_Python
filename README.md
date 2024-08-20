@@ -23,5 +23,5 @@ Dưới đây là mô tả ngắn gọn về các thư mục và file trong dự
 
 ### Yêu cầu hệ thống (Khuyên dùng với Pycharm)
 
-- Python 3.1x.x
+- Python 3.1x
 - pygame 2.0.6
