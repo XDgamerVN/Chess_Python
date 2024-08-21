@@ -6,8 +6,7 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 
 ## 2. Cấu trúc dự án
 
-- `Chess_python/`: thư mục chứ file tài tài nguyên cơ bản để chạy game với Chess_python.exe
-- `images/`: Thư mục chứa các tài nguyên hình ảnh quân cờ dạng PNG.
+- `images/`: Thư mục chứa các tài nguyên hình ảnh quân cờ dạng PNG và ICO.
 
 ### Các file Python (chưa được tối ưu)
 
