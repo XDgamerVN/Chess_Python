@@ -72,8 +72,7 @@ class GameState:
                 # Define the dimensions for the promotion window
 
                 promote_window = p.Surface((PROMOTE_WIDTH, PROMOTE_HEIGHT))
-                promote_window.set_alpha(200)
-                promote_window.fill(p.Color("black"))
+                promote_window.fill(p.Color("grey22"))
 
                 # Load images for promotion pieces
                 if piece_color == 'w':
@@ -695,8 +694,10 @@ class Move:
 
         # Pawn moves
         if self.piece_moved[1] == 'P':
-            if self.is_capture and self.is_pawn_promotion:  # Pawn promotion
+            if self.is_pawn_promotion and not self.is_capture:  # Pawn promotion
                 return f'{end_square}={promoted_piece}'
+            elif self.is_capture and self.is_pawn_promotion:  # Capture move
+                return f'{self.columns_to_files[self.start_column]}x{end_square}={promoted_piece}'
             elif self.is_capture and not self.is_pawn_promotion:  # Capture move
                 return f'{self.columns_to_files[self.start_column]}x{end_square}'
             else:  # Normal movement
