@@ -25,6 +25,7 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 `Chess_Python.exe`
 
 ### Linux 
+Mở terminal
 `./Chess_Python`
 
 ### Yêu cầu hệ thống (Khuyên dùng với Pycharm)
