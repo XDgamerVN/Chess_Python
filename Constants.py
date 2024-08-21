@@ -4,8 +4,8 @@ p.init()
 
 CHESS_BOARD = 700
 
-WIDTH = CHESS_BOARD * 1.6
-HEIGHT = CHESS_BOARD * 1.2
+WIDTH = CHESS_BOARD * 1.55
+HEIGHT = CHESS_BOARD * 1.16
 screen = p.display.set_mode((WIDTH, HEIGHT))
 p.display.set_caption("Chess by Dũng")
 DIMENSION = 8  # Dimensions of a chess board are 8x8
@@ -26,6 +26,7 @@ font_path = 'Arial'
 small_font = p.font.SysFont(font_path, CHESS_BOARD // 45, False, False)
 medium_font = p.font.SysFont(font_path, CHESS_BOARD // 35, True, False)
 large_font = p.font.SysFont(font_path, CHESS_BOARD // 20, False, False)
+version_font = p.font.SysFont('verdana', CHESS_BOARD // 30, False, False)
 
 def load_images():
     """Initialize a global dictionary of images"""
