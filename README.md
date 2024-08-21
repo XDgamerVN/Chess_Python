@@ -24,4 +24,4 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 ### Yêu cầu hệ thống (Khuyên dùng với Pycharm)
 
 - Python 3.1x
-- pygame 2.0.6
+- pygame 2.6.0
