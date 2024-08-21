@@ -11,8 +11,9 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 
 ### Các file Python (chưa được tối ưu)
 
-- `Main.py`: Chứa các chức năng chính của trò chơi.
-- `Engine.py`: Chứa các thư viên trò chơi cờ vua.
+- `Main.py`: Chúa giao diện trò chơi
+- `Game.py`: Chứa các chức năng chính của trò chơi.
+- `Engine.py`: Chứa các thư viên trò chơi.
 - `Constants.py`: Chứa các tỉ lệ hiển thị.
 
 ## 3. Thử nghiệm
