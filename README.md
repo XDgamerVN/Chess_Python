@@ -11,7 +11,7 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 
 ### Các file Python (chưa được tối ưu)
 
-- `Main.py`: Chúa giao diện trò chơi
+- `Main.py`: Chứa giao diện trò chơi
 - `Game.py`: Chứa các chức năng chính của trò chơi.
 - `Engine.py`: Chứa các thư viên trò chơi.
 - `Constants.py`: Chứa các tỉ lệ hiển thị.
@@ -20,6 +20,12 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 - `ChessAI.py`: máy chơi cờ (chưa co file)
 
 ## 4. Hướng dẫn cài đặt và sử dụng
+
+### Windows
+`Chess_Python.exe`
+
+### Linux 
+`./Chess_Python`
 
 ### Yêu cầu hệ thống (Khuyên dùng với Pycharm)
 
