@@ -28,7 +28,7 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 Mở terminal
 `./Chess_Python`
 
-### Yêu cầu hệ thống (Khuyên dùng với Pycharm)
+### Yêu cầu hệ thống đối với dev (Khuyên dùng với Pycharm)
 
 - Python 3.1x
 - pygame 2.6.0
