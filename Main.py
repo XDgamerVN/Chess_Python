@@ -1,6 +1,7 @@
 from Engine import *
 from Constants import *
 import pygame as p
+import sys
 
 p.init()
 
@@ -42,8 +43,10 @@ def draw_board(screen):
         color = COLOR_Z[(i % 2)]
         text = medium_font.render(str(8 - i), True, color)
         screen.blit(text, (SQ_SIZE * 0.05, SQ_SIZE // 25 + i * SQ_SIZE))
-    p.draw.rect(screen, 'grey22', p.Rect(0, SQ_SIZE * 8.2, SQ_SIZE * 8, SQ_SIZE // 1.75), 2)
-    p.draw.rect(screen, 'grey22', p.Rect(0, SQ_SIZE * 8.8, SQ_SIZE * 8, SQ_SIZE // 1.75), 2)
+    p.draw.rect(screen, 'grey22', p.Rect(0, SQ_SIZE * 8.1, SQ_SIZE * 7.9, SQ_SIZE // 1.75), 2)
+    p.draw.rect(screen, 'grey22', p.Rect(0, SQ_SIZE * 8.7, SQ_SIZE * 7.9, SQ_SIZE // 1.75), 2)
+    text_version = version_font.render('v0.2 Beta', True, p.Color('black'))
+    screen.blit(text_version, (SQ_SIZE * 11, SQ_SIZE * 9))
 
 def draw_pieces(screen, board):
     """Draws pieces on the board using the current GameState.board"""
@@ -62,13 +65,13 @@ def draw_captured_pieces(screen, captured_pieces):
     for i, piece in enumerate(white_captures):
         piece_image = captures_images.get(piece)
         if piece_image:
-            screen.blit(piece_image, (i * SQ_SIZE // 2, SQ_SIZE * 8.2))
+            screen.blit(piece_image, (i * SQ_SIZE // 2, SQ_SIZE * 8.1))
 
     # Vẽ quân cờ đen đã bị ăn (hàng dưới)
     for i, piece in enumerate(black_captures):
         piece_image = captures_images.get(piece)
         if piece_image:
-            screen.blit(piece_image, (i * SQ_SIZE // 2, SQ_SIZE * 8.8))
+            screen.blit(piece_image, (i * SQ_SIZE // 2, SQ_SIZE * 8.7))
 
 def highlight_king_in_check(screen, king_position):
     """Hàm vẽ viền đỏ quanh quân vua khi bị chiếu"""
@@ -111,7 +114,7 @@ def highlight_valid_moves(screen, game_state, valid_moves, square_selected):
 
 def draw_move_log(screen, game_state):
     """Draws move log to the right of the screen"""
-    move_log_area = p.Rect(SQ_SIZE * 8, SQ_SIZE * 3, SQ_SIZE * 5, SQ_SIZE * 5)
+    move_log_area = p.Rect(SQ_SIZE * 8.1, SQ_SIZE * 2, SQ_SIZE * 4.4, SQ_SIZE * 7)
     p.draw.rect(screen, p.Color('grey22'), move_log_area)
     move_log = game_state.move_log
     move_texts = []
@@ -124,7 +127,7 @@ def draw_move_log(screen, game_state):
     move_padding = 4
     text_y = move_padding
     for j in range(0, len(move_texts), 4):
-        text_line = ' | '.join(move_texts[j:j + 4])  # Ghi lại 5 lượt đi chung trên 1 dòng
+        text_line = ' | '.join(move_texts[j:j + 4])
         text_object = small_font.render(text_line, True, p.Color('white'))
         text_location = move_log_area.move(move_padding, text_y)
         screen.blit(text_object, text_location)
@@ -165,16 +168,35 @@ def animate_move(move, screen, board, clock):
         p.display.flip()
         clock.tick(60)  # Controls fame rate per second for the animation
 
-def draw_endgame_text(screen, text):
-    """Vẽ văn bản khi kết thúc trò chơi"""
-    text_object = large_font.render(text, True, p.Color('gray'), p.Color('mintcream'))
-    text_location = p.Rect(0, 0, WIDTH, HEIGHT).move(SQ_SIZE * 8 - text_object.get_width() / 2,
-                                                     SQ_SIZE * 2 - text_object.get_height() / 2)
+def draw_endgame_menu(screen, text):
+    """Vẽ văn bản khi kết thúc trò chơi và hiển thị menu với tùy chọn Replay và Exit"""
+    p.draw.rect(screen, 'grey22', p.Rect(SQ_SIZE * 8.25, SQ_SIZE // 2, SQ_SIZE * 4, SQ_SIZE * 1.1))
+
+    # Vẽ văn bản kết thúc trò chơi
+    text_object = large_font.render(text, True, p.Color('white'))
+    text_location = p.Rect(SQ_SIZE * 8.45, SQ_SIZE // 2, 0, 0)
     screen.blit(text_object, text_location)
 
-    # Creates a shadowing effect
-    text_object = large_font.render(text, True, p.Color('black'))
-    screen.blit(text_object, text_location.move(2, 2))
+    # Hiển thị menu kết thúc trò chơi với tùy chọn Replay và Exit
+    text_color = p.Color('white')
+    replay_color = p.Color('darkgreen')
+    exit_color = p.Color('red')
+
+    # Hiển thị nút "Replay"
+    replay_button = p.Rect(SQ_SIZE * 8.45, SQ_SIZE, SQ_SIZE * 1.5, SQ_SIZE // 2)
+    p.draw.rect(screen, replay_color, replay_button)
+    replay_text = large_font.render('Replay', True, text_color)
+    screen.blit(replay_text, replay_button.move(SQ_SIZE // 4, 0))
+
+    # Hiển thị nút "Exit"
+    exit_button = p.Rect(SQ_SIZE * 10.45, SQ_SIZE, SQ_SIZE * 1.5, SQ_SIZE // 2)
+    p.draw.rect(screen, exit_color, exit_button)
+    exit_text = large_font.render('Exit', True, text_color)
+    screen.blit(exit_text, exit_button.move(SQ_SIZE // 2, 0))
+
+    p.display.flip()
+
+    return replay_button, exit_button
 
 def main():
     """Main function which handles user input and updates graphics"""
@@ -251,10 +273,36 @@ def main():
                 text = 'Stalemate'
             else:
                 text = 'Black wins by checkmate' if game_state.white_to_move else 'White wins by checkmate'
-            draw_endgame_text(screen, text)
+
+            replay_button, exit_button = draw_endgame_menu(screen, text)
+
+            while game_over:
+                for event in p.event.get():
+                    if event.type == p.QUIT:
+                        running = False
+                        game_over = False
+                    elif event.type == p.MOUSEBUTTONDOWN:
+                        mouse_pos = p.mouse.get_pos()
+                        if replay_button.collidepoint(mouse_pos):
+                            game_state = GameState()
+                            valid_moves = game_state.get_valid_moves()
+                            square_selected = ()
+                            player_clicks = []
+                            move_made = False
+                            animate = False
+                            game_over = False
+
+                            screen.fill(p.Color('dark grey'))
+                        elif exit_button.collidepoint(mouse_pos):
+                            running = False
+                            sys.quit()
+
+                clock.tick(FPS)
 
         clock.tick(FPS)
         p.display.flip()
 
+
 if __name__ == '__main__':
     main()
+
