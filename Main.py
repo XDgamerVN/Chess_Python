@@ -9,21 +9,6 @@ screen = p.display.set_mode((WIDTH, HEIGHT))
 p.display.set_caption('Chess Main Menu')
 clock = p.time.Clock()
 
-
-def draw_button(text, x, y, color, hover_color):
-    """Vẽ nút với màu sắc và vị trí đã chỉ định"""
-    mouse_pos = p.mouse.get_pos()
-    button_rect = p.Rect(x, y, BUTTON_WIDTH, BUTTON_HEIGHT)
-    if button_rect.collidepoint(mouse_pos):
-        p.draw.rect(screen, hover_color, button_rect)
-    else:
-        p.draw.rect(screen, color, button_rect)
-
-    text_surface = large_font.render(text, True, 'black')
-    screen.blit(text_surface, text_surface.get_rect(center=button_rect.center))
-    return button_rect
-
-
 def pve_menu():
     """Hiển thị menu PvE"""
     running = True
