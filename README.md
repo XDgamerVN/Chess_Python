@@ -14,11 +14,9 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 - `Game.py`: Chứa các chức năng chính của trò chơi.
 - `Engine.py`: Chứa các thư viên trò chơi.
 - `Constants.py`: Chứa các tỉ lệ hiển thị.
+- `ChessAI.py`: máy chơi cờ (thử nghiệm)
 
-## 3. Thử nghiệm
-- `ChessAI.py`: máy chơi cờ (chưa co file)
-
-## 4. Hướng dẫn cài đặt và sử dụng
+## 3. Hướng dẫn cài đặt và sử dụng
 
 ### Windows
 `Chess_Python.exe`
