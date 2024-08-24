@@ -135,18 +135,18 @@ def find_best_move(game_state, valid_moves):
 
 def find_negamax_move_alphabeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
     """
-    Thuật toán Negamax với cắt tỉa alpha beta.
+    NegaMax algorithm with alpha beta pruning.
 
-    Alpha Beta cắt tỉa loại bỏ sự cần thiết phải kiểm tra tất cả các động tác trong cây game_state khi
-    Một chi nhánh tốt hơn đã được tìm thấy hoặc một nhánh có điểm quá thấp.
+    Alpha beta pruning eliminates the need to check all moves within the game_state tree when
+    a better branch has been found or a branch has too low of a score.
 
-    alpha: giới hạn trên (tối đa có thể); Beta: giới hạn dưới (tối thiểu có thể)
-    Nếu điểm tối đa lớn hơn alpha, điều đó sẽ trở thành giá trị alpha mới.
-    Nếu alpha trở thành> = beta, thoát ra khỏi nhánh.
+    alpha: upper bound (max possible); beta: lower bound (min possible)
+    If max score is greater than alpha, that becomes the new alpha value.
+    If alpha becomes >= beta, break out of branch.
 
-    Màu trắng luôn cố gắng tối đa hóa điểm số và màu đen luôn
-    Cố gắng giảm thiểu điểm số. Một khi khả năng tối đa hoặc thấp hơn tối đa
-    đã bị loại bỏ, không cần phải kiểm tra thêm các nhánh.
+    White is always trying to maximise score and black is always
+    trying to minimise score. Once the possibility of a higher max or lower min
+    has been eliminated, there is no need to check further branches.
     """
     global next_move
     if depth == 0:
@@ -170,7 +170,6 @@ def find_negamax_move_alphabeta(game_state, valid_moves, depth, alpha, beta, tur
             break
 
     return max_score
-
 
 def score_board(game_state):
     """Positive score is good for white; negative score is good for black."""
