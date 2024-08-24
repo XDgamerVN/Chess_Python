@@ -10,11 +10,13 @@ Dự án này là một trò chơi cờ vua (Chess) được phát triển bằn
 
 ### Các file Python (chưa được tối ưu)
 
-- `Main.py`: Chứa giao diện trò chơi
-- `Game.py`: Chứa các chức năng chính của trò chơi.
-- `Engine.py`: Chứa các thư viên trò chơi.
-- `Constants.py`: Chứa các tỉ lệ hiển thị.
 - `ChessAI.py`: máy chơi cờ (thử nghiệm sử dụng thuật Negamax với cắt tỉ alpha beta, đây là loại AI flash)
+- `Constants.py`: Chứa các tỉ lệ hiển thị.
+- `Engine.py`: Chứa các thư viên trò chơi.
+- `EngineAI.py`: Chứa các thư viên trò chơi dành cho AI.
+- `Game.py`: Chứa các chức năng chính của trò chơi.
+- `Main.py`: Chứa giao diện trò chơi
+- `vsAI`: Chứa các chức năng chính của trò chơi khi chơi với AI
 
 ## 3. Hướng dẫn cài đặt và sử dụng
 
