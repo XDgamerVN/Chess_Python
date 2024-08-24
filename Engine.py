@@ -1,5 +1,6 @@
 from Constants import *
-import pygame as p
+import pygame
+
 
 class GameState:
     """
@@ -35,8 +36,8 @@ class GameState:
         self.in_check = False
         self.pins = []
         self.checks = []
-        self.captured_pieces = []  # Lưu trữ các quân cờ đã bị ăn
-
+        self.white_captured_pieces = []
+        self.black_captured_pieces = []
 
         # En passant
         self.en_passant_possible = ()  # Coordinates for square where en passant possible
@@ -65,14 +66,15 @@ class GameState:
 
         # Pawn promotion
         if move.is_pawn_promotion:
+
             if (self.white_to_move and move.end_row == 0) or (not self.white_to_move and move.end_row == 7):
                 window_y = SQ_SIZE * (1 if self.white_to_move else 3)
                 window_x = move.end_column * SQ_SIZE
                 piece_color = move.piece_moved[0]
                 # Define the dimensions for the promotion window
 
-                promote_window = p.Surface((PROMOTE_WIDTH, PROMOTE_HEIGHT))
-                promote_window.fill(p.Color("grey22"))
+                promote_window = pygame.Surface((PROMOTE_WIDTH, PROMOTE_HEIGHT))
+                promote_window.fill(pygame.Color("grey22"))
 
                 # Load images for promotion pieces
                 if piece_color == 'w':
@@ -82,23 +84,23 @@ class GameState:
 
                 # Draw the pieces onto the promotion window
                 for piece in pieces:
-                    promote_images[piece] = p.transform.smoothscale(p.image.load(f'images/{piece}.png'), PIECE_SIZE)
+                    promote_images[piece] = pygame.transform.smoothscale(pygame.image.load(f'images/{piece}.png'), PIECE_SIZE)
 
                 # Draw the pieces onto the promotion window
                 for i, piece in enumerate(pieces):
                     piece_image = promote_images[piece]
-                    promote_window.blit(piece_image, p.Rect(0, i * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+                    promote_window.blit(piece_image, pygame.Rect(0, i * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
                 # Display the promotion window on the main screen
 
                 screen.blit(promote_window, (window_x, window_y))
-                p.display.flip()
+                pygame.display.flip()
 
                 # Wait for the player to select a piece
                 promoted_piece = None
                 while promoted_piece is None:
-                    for event in p.event.get():
-                        if event.type == p.MOUSEBUTTONDOWN:
+                    for event in pygame.event.get():
+                        if event.type == pygame.MOUSEBUTTONDOWN:
                             x, y = event.pos
                             if window_x <= x <= window_x + PROMOTE_WIDTH and window_y <= y <= window_y + PROMOTE_HEIGHT:
                                 selected_index = (x - window_x) // SQ_SIZE
@@ -107,8 +109,9 @@ class GameState:
                                     break
 
                 # Clear the promotion window by redrawing the main game state
-                screen.fill(p.Color("dark grey"))  # Assuming white is the background color of the main screen
-                p.display.flip()
+                screen.fill(pygame.Color("dark grey"))  # Assuming white is the background color of the main screen
+                pygame.display.flip()
+
             self.board[move.end_row][move.end_column] = promoted_piece
 
         # En passant
@@ -141,8 +144,11 @@ class GameState:
 
         self.white_to_move = not self.white_to_move  # Switches turns
 
-        if move.piece_captured != '--':  # Nếu một quân cờ bị ăn
-            self.captured_pieces.append(move.piece_captured)
+        if move.piece_captured:
+            if move.piece_captured[0] == 'w':
+                self.white_captured_pieces.append(move.piece_captured)
+            elif move.piece_captured[0] == 'b':
+                self.black_captured_pieces.append(move.piece_captured)
 
     def undo_move(self):
         """Undos last move made"""
@@ -181,6 +187,13 @@ class GameState:
                 else:  # Queen side
                     self.board[move.end_row][move.end_column - 2] = self.board[move.end_row][move.end_column + 1]
                     self.board[move.end_row][move.end_column + 1] = '--'
+
+            # Restore captured pieces
+            if move.piece_captured:
+                if move.piece_captured[0] == 'w':
+                    self.white_captured_pieces.remove(move.piece_captured)
+                elif move.piece_captured[0] == 'b':
+                    self.black_captured_pieces.remove(move.piece_captured)
 
             self.checkmate = False
             self.stalemate = False
@@ -644,7 +657,6 @@ class Move:
     files_to_columns = {'a': 0, 'b': 1, 'c': 2, 'd': 3,
                         'e': 4, 'f': 5, 'g': 6, 'h': 7}
     columns_to_files = {v: k for k, v in files_to_columns.items()}
-
 
     def __init__(self, start_square, end_square, board, en_passant=False, pawn_promotion=False, castle=False):
         self.start_row, self.start_column = start_square[0], start_square[1]
