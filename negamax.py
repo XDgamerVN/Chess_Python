@@ -1,9 +1,9 @@
 import random
 
-# Depth of the algorithm determining AI moves. Higher set_depth == harder AI. Lower if engine is too slow.
+# Độ sâu của thuật toán xác định AI di chuyển. Set_depth cao hơn == AI khó hơn. Thấp hơn nếu động cơ quá chậm.
 set_depth = 4
 
-# Positive values are good for white, negative for black. i.e. black checkmate = -1000
+# Giá trị tích cực là tốt cho màu trắng, tiêu cực cho màu đen. Tức là Checkmate đen = -1000
 checkmate_points = 1000
 stalemate_points = 0
 
@@ -123,30 +123,30 @@ def find_random_move(valid_moves):
     return random.choice(valid_moves)
 
 
-def find_best_move(game_state, valid_moves):
+def find_best_move(game_state, valid_moves, SQ_SIZE):
     """Helper method to make first recursive call"""
     global next_move
     next_move = None
     random.shuffle(valid_moves)
     find_negamax_move_alphabeta(game_state, valid_moves, set_depth, -checkmate_points, checkmate_points,
-                                1 if game_state.white_to_move else -1)
+                                1 if game_state.white_to_move else -1, SQ_SIZE)
     return next_move
 
 
-def find_negamax_move_alphabeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier):
+def find_negamax_move_alphabeta(game_state, valid_moves, depth, alpha, beta, turn_multiplier, SQ_SIZE):
     """
-    NegaMax algorithm with alpha beta pruning.
+    Thuật toán Negamax với cắt tỉa alpha beta.
 
-    Alpha beta pruning eliminates the need to check all moves within the game_state tree when
-    a better branch has been found or a branch has too low of a score.
+    Alpha Beta cắt tỉa loại bỏ sự cần thiết phải kiểm tra tất cả các động tác trong cây game_state khi
+    Một chi nhánh tốt hơn đã được tìm thấy hoặc một nhánh có điểm quá thấp.
 
-    alpha: upper bound (max possible); beta: lower bound (min possible)
-    If max score is greater than alpha, that becomes the new alpha value.
-    If alpha becomes >= beta, break out of branch.
+    alpha: giới hạn trên (tối đa có thể); Beta: giới hạn dưới (tối thiểu có thể)
+    Nếu điểm tối đa lớn hơn alpha, điều đó sẽ trở thành giá trị alpha mới.
+    Nếu alpha trở thành> = beta, thoát ra khỏi nhánh.
 
-    White is always trying to maximise score and black is always
-    trying to minimise score. Once the possibility of a higher max or lower min
-    has been eliminated, there is no need to check further branches.
+    Màu trắng luôn cố gắng tối đa hóa điểm số và màu đen luôn
+    Cố gắng giảm thiểu điểm số. Một khi khả năng tối đa hoặc thấp hơn tối đa
+    đã bị loại bỏ, không cần phải kiểm tra thêm các nhánh.
     """
     global next_move
     if depth == 0:
@@ -154,9 +154,10 @@ def find_negamax_move_alphabeta(game_state, valid_moves, depth, alpha, beta, tur
 
     max_score = -checkmate_points
     for move in valid_moves:
-        game_state.make_move(move)
+        game_state.make_move(move, SQ_SIZE)
+
         next_moves = game_state.get_valid_moves()
-        score = -find_negamax_move_alphabeta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
+        score = -find_negamax_move_alphabeta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier, SQ_SIZE)
         if score > max_score:
             max_score = score
             if depth == set_depth:
@@ -171,8 +172,9 @@ def find_negamax_move_alphabeta(game_state, valid_moves, depth, alpha, beta, tur
 
     return max_score
 
+
 def score_board(game_state):
-    """Positive score is good for white; negative score is good for black."""
+    """Điểm tích cực là tốt cho màu trắng; Điểm âm là tốt cho màu đen."""
     if game_state.checkmate:
         if game_state.white_to_move:
             return -checkmate_points  # Black wins
