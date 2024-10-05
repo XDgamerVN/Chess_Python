@@ -1,20 +1,26 @@
-from Constants import *
-import pygame
-
+from additions import *
 
 class GameState:
     """
-    Lớp chịu trách nhiệm lưu trữ thông tin về trạng thái hiện tại của trò chơi.
-    Các hàm trong lớp này chịu trách nhiệm về cách di chuyển được thực hiện, hoàn tác,
-    xác định các bước di chuyển hợp lệ với trạng thái hiện tại và lưu giữ nhật ký di chuyển.
+    Lớp chịu trách nhiệm lưu trữ các thông tin cơ bản của trò chơi.
+    Các hàm trong lớp chịu trách nhiệm về:
+        - Di chuyển quân cờ
+        - Hoàn tác nước đi
+        - Xác định các nước đi hợp lệ
+        - Nhập kí nước đi
     """
-
     def __init__(self):
         """
-        Bảng là một danh sách 8x8 2d. Mỗi phần tử có 2 ký tự.
-        Ký tự thứ 1 đại diện cho màu sắc của tác phẩm (b / w).
-        Ký tự thứ 2 đại diện cho loại quân cờ.
-        "--" đại diện cho một không gian trống rỗng không có mảnh.
+        Danh sách bàn cờ 8x8 2d cơ bản:
+            - "b" (black): là mùa của quân cờ màu đen
+            - "w" (white): là mùa của quân cờ màu trang
+            - "R" (rock): là quân xe
+            - "N" (knight): là quân mã
+            - "B" (bishop): là quân tượng
+            - "Q" (queen): là quân hậu
+            - "K" (king): là quân vua
+            - "P" (pawn): là quân tốt
+            - "--": là một không gian trống
         """
         self.board = [
             ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],
@@ -34,6 +40,7 @@ class GameState:
         self.checkmate = False
         self.stalemate = False
         self.in_check = False
+        self.negamax_turn = False
         self.pins = []
         self.checks = []
         self.white_captured_pieces = []
@@ -51,7 +58,7 @@ class GameState:
         self.castle_rights_log = [CastleRights(self.white_castle_king_side, self.black_castle_king_side,
                                                self.white_castle_queen_side, self.black_castle_queen_side)]
 
-    def make_move(self, move):
+    def make_move(self, move, SQ_SIZE):
         """Takes a move as a parameter, executes it, and updates move log"""
         global promoted_piece
 
@@ -66,52 +73,53 @@ class GameState:
 
         # Pawn promotion
         if move.is_pawn_promotion:
-
-            if (self.white_to_move and move.end_row == 0) or (not self.white_to_move and move.end_row == 7):
-                window_y = SQ_SIZE * (1 if self.white_to_move else 3)
-                window_x = move.end_column * SQ_SIZE
-                piece_color = move.piece_moved[0]
-                # Define the dimensions for the promotion window
-
-                promote_window = pygame.Surface((PROMOTE_WIDTH, PROMOTE_HEIGHT))
-                promote_window.fill(pygame.Color("grey22"))
-
-                # Load images for promotion pieces
-                if piece_color == 'w':
-                    pieces = ['wQ', 'wR', 'wB', 'wN']
+            """Gọi quân phong cấp"""
+            if self.negamax_turn:  # Nếu đây là lượt của AI
+                if self.white_to_move:
+                    promoted_piece = 'wQ'
                 else:
-                    pieces = ['bQ', 'bR', 'bB', 'bN']
+                    promoted_piece = 'bQ'
+            else:
+                in_promote = True
+                while in_promote:
+                    y = SQ_SIZE * (0 if self.white_to_move else 4)
+                    x = move.end_column * SQ_SIZE
+                    piece_color = move.piece_moved[0]
+                    if piece_color == 'w':
+                        pieces = ['wQ', 'wR', 'wB', 'wN']
+                    else:
+                        pieces = ['bQ', 'bR', 'bB', 'bN']
+                    # Vẽ lựa chọn phong cấp
+                    draw_button("", 0, x, y, SQ_SIZE, SQ_SIZE * 4,
+                                SQ_SIZE // 7, 0,
+                                COLOR_SCREEN, COLOR_SCREEN, 'dark gray', 'dark gray', COLOR_SCREEN)
 
-                # Draw the pieces onto the promotion window
-                for piece in pieces:
-                    promote_images[piece] = pygame.transform.smoothscale(pygame.image.load(f'images/{piece}.png'), PIECE_SIZE)
+                    # Vẽ các quân cờ phong cấp trực tiếp lên screen
+                    for i, piece in enumerate(pieces):
+                        # Hiển thị từng quân cờ trực tiếp lên screen
+                        screen.blit(promote_images[piece], pygame.Rect(x, y + i * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-                # Draw the pieces onto the promotion window
-                for i, piece in enumerate(pieces):
-                    piece_image = promote_images[piece]
-                    promote_window.blit(piece_image, pygame.Rect(0, i * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+                    # Hiển thị các thay đổi lên màn hình
+                    pygame.display.flip()
 
-                # Display the promotion window on the main screen
+                    # Chờ người chơi chọn quân phong cấp
+                    promoted_piece = None
+                    while promoted_piece is None:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                quit_game(SQ_SIZE)
+                            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                                x, y = event.pos
+                                # Kiểm tra xem người chơi có chọn trong phạm vi các quân phong cấp không
+                                if x <= x <= x + SQ_SIZE and y <= y <= y + SQ_SIZE * 4:
+                                    selected_index = (y - y) // SQ_SIZE
+                                    if 0 <= selected_index < len(pieces):
+                                        promoted_piece = pieces[selected_index]
+                                        in_promote = False  # Kết thúc vòng lặp phong cấp
+                                        break
+                        clock.tick(60)
 
-                screen.blit(promote_window, (window_x, window_y))
-                pygame.display.flip()
-
-                # Wait for the player to select a piece
-                promoted_piece = None
-                while promoted_piece is None:
-                    for event in pygame.event.get():
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            x, y = event.pos
-                            if window_x <= x <= window_x + PROMOTE_WIDTH and window_y <= y <= window_y + PROMOTE_HEIGHT:
-                                selected_index = (x - window_x) // SQ_SIZE
-                                if 0 <= selected_index < len(pieces):
-                                    promoted_piece = pieces[selected_index]
-                                    break
-
-                # Clear the promotion window by redrawing the main game state
-                screen.fill(pygame.Color("dark grey"))  # Assuming white is the background color of the main screen
-                pygame.display.flip()
-
+            # Cập nhật bàn cờ với quân phong cấp
             self.board[move.end_row][move.end_column] = promoted_piece
 
         # En passant
@@ -136,6 +144,7 @@ class GameState:
                 self.board[move.end_row][move.end_column + 1] = self.board[move.end_row][
                     move.end_column - 2]  # Moves rook
                 self.board[move.end_row][move.end_column - 2] = '--'  # Erases old rook
+            play_sound("move-self.mp3")
 
         # Updates castling rights
         self.update_castle_rights(move)
@@ -144,7 +153,7 @@ class GameState:
 
         self.white_to_move = not self.white_to_move  # Switches turns
 
-        if move.piece_captured:
+        if move.piece_captured != '--':
             if move.piece_captured[0] == 'w':
                 self.white_captured_pieces.append(move.piece_captured)
             elif move.piece_captured[0] == 'b':
@@ -567,72 +576,106 @@ class GameState:
         return False
 
     def check_for_pins_and_checks(self):
-        """Returns if the player is in check, a list of pins, and a list of checks"""
+        """Trả về trạng thái vua có đang bị chiếu (check), danh sách các quân bị ghim (pin), và danh sách các nước chiếu (check)"""
         pins = []
         checks = []
         in_check = False
 
         if self.white_to_move:
-            opponent = 'b'
-            ally = 'w'
-            start_row, start_column = self.white_king_location[0], self.white_king_location[1]
+            opponent = 'b'  # Quân đối thủ là đen
+            ally = 'w'  # Quân đồng minh là trắng
+            start_row, start_column = self.white_king_location[0], self.white_king_location[1]  # Vị trí của vua trắng
         else:
-            opponent = 'w'
-            ally = 'b'
-            start_row, start_column = self.black_king_location[0], self.black_king_location[1]
+            opponent = 'w'  # Quân đối thủ là trắng
+            ally = 'b'  # Quân đồng minh là đen
+            start_row, start_column = self.black_king_location[0], self.black_king_location[1]  # Vị trí của vua đen
 
+        # Các hướng đi để kiểm tra nước chiếu và ghim
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1))
         for j in range(len(directions)):
             d = directions[j]
-            possible_pin = ()  # Resets possible pins
+            possible_pin = ()  # Khởi tạo ghim có thể xảy ra
             for i in range(1, len(self.board)):
                 end_row = start_row + d[0] * i
                 end_column = start_column + d[1] * i
-                if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):
+                if 0 <= end_row < len(self.board) and 0 <= end_column < len(
+                        self.board):  # Kiểm tra vị trí trong bảng cờ
                     end_piece = self.board[end_row][end_column]
                     if end_piece[0] == ally and end_piece[1] != 'K':
-                        if possible_pin == ():  # 1st ally piece can be pinned
+                        if possible_pin == ():  # Quân đồng minh đầu tiên có thể bị ghim
                             possible_pin = (end_row, end_column, d[0], d[1])
-                        else:  # 2nd ally piece, so no pin or check possible
+                        else:  # Gặp quân đồng minh thứ hai, không thể ghim hoặc chiếu
                             break
                     elif end_piece[0] == opponent:
                         piece_type = end_piece[1]
+                        # Kiểm tra nếu là quân xe, tượng, hậu, tốt hoặc vua đối phương đang chiếu
                         if (0 <= j <= 3 and piece_type == 'R') or (4 <= j <= 7 and piece_type == 'B') or \
-                                (i == 1 and piece_type == 'P' and ((opponent == 'w' and 6 <= j <= 7)
-                                                                   or (opponent == 'b' and 4 <= j <= 5))) or \
-                                (piece_type == 'Q') or (i == 1 and piece_type == 'K'):
-                            if possible_pin == ():  # no piece blocking, so check
+                                (i == 1 and piece_type == 'P' and ((opponent == 'w' and 6 <= j <= 7) or
+                                (opponent == 'b' and 4 <= j <= 5))) or (piece_type == 'Q') or (i == 1 and piece_type == 'K'):
+                            if possible_pin == ():  # Không có quân chặn, vua đang bị chiếu
                                 in_check = True
                                 checks.append((end_row, end_column, d[0], d[1]))
                                 break
-                            else:  # Piece blocking, so pin
+                            else:  # Có quân chặn, ghim quân đồng minh
                                 pins.append(possible_pin)
                                 break
-                        else:  # Enemy piece but not applying check
+                        else:  # Quân đối phương nhưng không có chiếu
                             break
-                else:  # Off board
+                else:  # Ra ngoài bảng cờ
                     break
 
+        # Kiểm tra nước đi của quân mã
         knight_moves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
         for move in knight_moves:
             end_row = start_row + move[0]
             end_column = start_column + move[1]
-            if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):
+            if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Kiểm tra trong bảng cờ
                 end_piece = self.board[end_row][end_column]
-                if end_piece[0] == opponent and end_piece[1] == 'N':
+                if end_piece[0] == opponent and end_piece[1] == 'N':  # Nếu quân mã của đối phương đang chiếu vua
                     in_check = True
                     checks.append((end_row, end_column, move[0], move[1]))
-
-        return in_check, pins, checks
+        return in_check, pins, checks  # Trả về kết quả: vua có bị chiếu, danh sách ghim, danh sách chiếu
 
     def find_king(self, white_to_move):
         """Tìm vị trí của quân vua dựa trên màu sắc"""
         king = 'wK' if white_to_move else 'bK'
-        for r in range(len(self.board)):
-            for c in range(len(self.board[r])):
-                if self.board[r][c] == king:
-                    return r, c
-        return None  # Trong trường hợp không tìm thấy vua (nên không xảy ra)
+        for row in range(len(self.board)):
+            for column in range(len(self.board[row])):
+                if self.board[row][column] == king:
+                    return row, column
+        return None
+
+    def insufficient_material(self):
+        """Kiểm tra cờ hòa do thế cờ chết"""
+        white_pieces = []
+        black_pieces = []
+
+        # Duyệt qua bàn cờ và phân loại các quân cờ
+        for row in self.board:
+            for piece in row:
+                if piece != '--':  # Nếu ô này không trống
+                    if piece[0] == 'w':  # Quân trắng
+                        white_pieces.append(piece[1])
+                    else:  # Quân đen
+                        black_pieces.append(piece[1])
+
+        # Nếu chỉ còn hai vua, cờ hòa do thế cờ chết
+        if white_pieces == ['K'] and black_pieces == ['K']:
+            self.stalemate = True
+            return
+
+        # Trường hợp chỉ có vua và mã hoặc vua và tượng
+        if (white_pieces == ['K', 'N'] or white_pieces == ['K', 'B']) and black_pieces == ['K']:
+            self.stalemate = True
+            return
+        if (black_pieces == ['K', 'N'] or black_pieces == ['K', 'B']) and white_pieces == ['K']:
+            self.stalemate = True
+            return
+
+        # Trường hợp cả hai bên chỉ có vua và mã
+        if white_pieces == ['K', 'N'] and black_pieces == ['K', 'N']:
+            self.stalemate = True
+            return
 
 
 class CastleRights:
