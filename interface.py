@@ -29,7 +29,7 @@ def support(SQ_SIZE):
         # Tạo các dòng văn bản
         text_support1 = font_support.render("Support Keys:", True, 'white')
         text_support2 = font_support.render("•  U: Undo the last move", True, 'white')
-        text_support3 = font_support.render("•  N: Toggle Negamax (unavailable)", True, 'white')
+        text_support3 = font_support.render("•  N: Toggle Negamax", True, 'white')
         text_support4 = font_support.render("•  ESC: Toggle support On/Off", True, 'white')
 
         # Hiển thị các dòng văn bản tại vị trí text_support
