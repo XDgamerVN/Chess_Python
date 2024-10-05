@@ -118,14 +118,16 @@ def setting(SQ_SIZE, size_index):
                         # Tăng chỉ số kích thước hiện tại và vòng lại nếu cần
                         size_index = (size_index + 1) % len(sizes)
                     WIDTH, HEIGHT = sizes[size_index]  # Cập nhật kích thước cửa sổ
+                    apply = False
                 elif apply_button.collidepoint(event.pos) and event.button == 1:
                     SQ_SIZE = HEIGHT // 8
                     screen = pygame.display.set_mode((WIDTH, HEIGHT))  # Thay đổi kích thước cửa sổ
                     screen.fill(COLOR_SCREEN)
+                    apply = True
                 elif version_button.collidepoint(event.pos) and event.button == 1:
                     code_version(SQ_SIZE)
                     screen.fill(COLOR_SCREEN)
-                elif back_button.collidepoint(event.pos) and event.button == 1:
+                elif back_button.collidepoint(event.pos) and event.button == 1 and apply == True:
                     return size_index, SQ_SIZE
         clock.tick(60)
         pygame.display.flip()
