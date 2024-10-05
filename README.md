@@ -2,7 +2,7 @@
 
 ## 1. Giới Thiệu
 
-Dự án này là một trò chơi cờ vua được phát triển bằng Python, với giao diện đồ họa thân thiện và đầy đủ các tính năng cơ bản của một ván cờ vua tiêu chuẩn. Trò chơi cho phép người dùng chơi với AI hoặc với bạn bè, mang lại trải nghiệm thú vị và thử thách.
+Dự án này là một trò chơi cờ vua được phát triển bằng Python, với giao diện đồ họa thân thiện và đầy đủ các tính năng cơ bản của một ván cờ vua tiêu chuẩn. Người dùng có thể chơi với bạn bè hoặc thử thách với máy (negamaxAI).
 
 <div align="center">
     <img src="images/gameplay.gif" alt="Ảnh gif gameplay" width="300" height="300">
@@ -21,10 +21,10 @@ Dự án được tổ chức theo cấu trúc sau:
 
 Dưới đây là danh sách các file Python trong dự án cùng với mô tả chức năng của chúng:
 
-- **`negamaxAI.py`**: Chương trình điều khiển AI (thử nghiệm với thuật toán Negamax).
-- **`constants.py`**: Chứa các hằng số sử dụng trong trò chơi.
+- **`negamaxAI.py`**: Thuật toán điều khiển AI (thuật toán Negamax).
+- **`constants.py`**: Các hằng số sử dụng trong trò chơi.
 - **`engine.py`**: Cung cấp các thư viện và chức năng cơ bản của trò chơi.
-- **`system.py`**: Chứa các chức năng chính và logic của trò chơi.
+- **`system.py`**: Chứa các chức năng chính của trò chơi.
 - **`interface.py`**: Định nghĩa giao diện người dùng cho trò chơi.
 - **`additions.py`**: Các bổ sung và tiện ích cho giao diện người dùng.
 - **`main.py`**: File khởi chạy chính của trò chơi.
@@ -89,7 +89,7 @@ sudo pacman -S sdl2_mixer libjpeg-turbo zlib
 #### Windows:
 
 - Tải Python từ trang chính thức: [python.org](https://www.python.org/)
-- Chạy trình cài đặt và đảm bảo chọn tùy chọn "Add Python to PATH"
+- Chạy trình cài đặt.
 - Mở Command Prompt và kiểm tra phiên bản Python bằng lệnh:
 
 ```bash
@@ -112,27 +112,25 @@ python main.py
 
 ### 4.5. Thưởng Thức Trò Chơi
 
-Khám phá và tận hưởng trò chơi! Bạn có thể thử chơi với AI hoặc cùng bạn bè để tìm kiếm chiến thắng.
+Bây gờ bạn có thể chơi cùng bạn bè hoặc thử thách với máy (negamaxAI)
 
 #### Các lưu ý cho người dùng Linux:
 
-- Nếu có bất kỳ vấn đề gì về âm thanh hoặc giao diện đồ họa, bạn có thể cần phải cài đặt các thư viện bổ sung của hệ thống như đã nêu trên.
+- Khi có vấn đề liên quan âm thanh hoặc giao diện, thì bạn phải cài đặt các thư viện bổ sung như đã nêu trên.
 - Nếu cần, bạn có thể cấp quyền thực thi cho tệp main.py bằng lệnh:
 
 ```bash
 chmod +x main.py
 ```
 
-Sau khi hoàn tất các bước trên, trò chơi sẽ khởi chạy bình thường trên Linux.
-
 ---
 
 ## 5. Tính Năng Nổi Bật
 
-- Chế độ chơi đơn và nhiều người chơi: Cho phép người dùng thi đấu với AI hoặc bạn bè. 
+- Chế độ đơn giản: Bạn có thể chơi cùng bạn thân hay thách thức với máy. 
 - AI thông minh: Dựa trên thuật toán Negamax để đưa ra các nước đi hợp lý.
-- Giao diện trực quan: Thiết kế giao diện thân thiện và dễ sử dụng.
-- Âm thanh sống động: Âm thanh và hiệu ứng được thiết kế để tăng trải nghiệm chơi game.
+- Giao diện trực quan: Đơn giản và dễ sử dụng.
+- Âm thanh sống động: Tăng trải nghiệm chơi game.
 
 ---
 
@@ -140,9 +138,10 @@ Sau khi hoàn tất các bước trên, trò chơi sẽ khởi chạy bình thư
 
 Tôi dự định cập nhật dự án với những tính năng mới, bao gồm:
 
-- Cải thiện AI với các thuật toán phức tạp hơn.
-- Thêm tính năng lưu trữ ván cờ để người dùng có thể quay lại sau.
-- Cải tiến giao diện người dùng với các tùy chọn tùy chỉnh phong cách chơi.
+- Cải thiện thuật toán AI.
+- Tính năng lưu trữ ván cờ.
+- Nâng cấp giao diện.
+- Tùy thỉnh giao diện quân cờ và bàn cờ.
 
 ---
 
