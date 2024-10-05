@@ -96,10 +96,15 @@ Chúng tôi dự định cập nhật dự án với những tính năng mới, 
 - Thêm tính năng lưu trữ ván cờ để người dùng có thể quay lại sau.
 - Cải tiến giao diện người dùng với các tùy chọn tùy chỉnh phong cách chơi.
 
-## 7. Liên Hệ
+## 7. Tài liệu tham khảo
+- Xin cảm ơn **LeMaster Tech** và **Eddie Sharick (Eddie)** về kiến thức phát triển dự án này
+- LeMaster Tech: [https://www.youtube.com/@lemastertech]
+- Eddie Sharick (Eddie): [https://www.youtube.com/@eddiesharick6649]
+
+## 8. Liên Hệ
 
 Nếu bạn có bất kỳ câu hỏi hoặc phản hồi nào, hãy liên hệ với chúng tôi qua địa chỉ email: [dungnguyen2661@gmail.com]
 
 ---
 
-Cảm ơn bạn đã quan tâm đến dự án của chúng tôi. Chúc bạn có những giờ phút chơi game vui vẻ!
+Cảm ơn bạn đã quan tâm đến dự án của tôi. Chúc bạn có những giờ phút chơi game vui vẻ!
