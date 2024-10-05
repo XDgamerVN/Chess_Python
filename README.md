@@ -97,7 +97,7 @@ Chúng tôi dự định cập nhật dự án với những tính năng mới, 
 - Cải tiến giao diện người dùng với các tùy chọn tùy chỉnh phong cách chơi.
 
 ## 7. Tài liệu tham khảo
-- Xin cảm ơn **LeMaster Tech** và **Eddie Sharick (Eddie)** về kiến thức phát triển dự án này
+- Xin cảm ơn **LeMaster Tech** và **Eddie Sharick (Eddie)** về kiến thức phát triển dự án này.
 - LeMaster Tech: [https://www.youtube.com/@lemastertech]
 - Eddie Sharick (Eddie): [https://www.youtube.com/@eddiesharick6649]
 
