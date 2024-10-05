@@ -59,19 +59,19 @@ class GameState:
                                                self.white_castle_queen_side, self.black_castle_queen_side)]
 
     def make_move(self, move, SQ_SIZE):
-        """Takes a move as a parameter, executes it, and updates move log"""
+        """Thực hiện một di chuyển làm tham số, thực thi nó và cập nhật nhật ký di chuyển"""
         global promoted_piece
 
-        self.board[move.start_row][move.start_column] = '--'  # When a piece is moved, the square it leaves is blank
-        self.board[move.end_row][move.end_column] = move.piece_moved  # Moves piece to new location
-        self.move_log.append(move)  # Logs move
+        self.board[move.start_row][move.start_column] = '--'  # Khi một mảnh được di chuyển, hình vuông mà nó để lại trống
+        self.board[move.end_row][move.end_column] = move.piece_moved  # Di chuyển mảnh đến vị trí mới
+        self.move_log.append(move)  # Nhật ký di chuyển
 
         if move.piece_moved == 'wK':
             self.white_king_location = (move.end_row, move.end_column)
         elif move.piece_moved == 'bK':
             self.black_king_location = (move.end_row, move.end_column)
 
-        # Pawn promotion
+        # Phong cấp cho quân tốt
         if move.is_pawn_promotion:
             """Gọi quân phong cấp"""
             if self.negamax_turn:  # Nếu đây là lượt của AI
@@ -122,37 +122,38 @@ class GameState:
             # Cập nhật bàn cờ với quân phong cấp
             self.board[move.end_row][move.end_column] = promoted_piece
 
-        # En passant
+        # Bắt tốt qua đường
         if move.is_en_passant_move:
-            self.board[move.start_row][move.end_column] = '--'  # Capturing the pawn
+            self.board[move.start_row][move.end_column] = '--'
 
-        # Updates the en_passant_possible variable
-        if move.piece_moved[1] == 'P' and abs(move.start_row - move.end_row) == 2:  # Only valid for 2 square pawn moves
+        # Cập nhật biến en_passant_posible
+        if move.piece_moved[1] == 'P' and abs(move.start_row - move.end_row) == 2:  # Chỉ có giá trị cho quân tốt di chuyển 2 ô
             self.en_passant_possible = ((move.start_row + move.end_row) // 2, move.start_column)
         else:
             self.en_passant_possible = ()
 
         self.en_passant_possible_log.append(self.en_passant_possible)
 
-        # Castling
+        # Nhập thành
         if move.is_castle_move:
-            if move.end_column - move.start_column == 2:  # King side castle
+            if move.end_column - move.start_column == 2:  # Nhập thành phía vua
                 self.board[move.end_row][move.end_column - 1] = self.board[move.end_row][
-                    move.end_column + 1]  # Moves rook
-                self.board[move.end_row][move.end_column + 1] = '--'  # Erases old rook
-            else:  # Queen side castle
+                    move.end_column + 1]  # di chuyển xe
+                self.board[move.end_row][move.end_column + 1] = '--'  # xóa xe cũ
+            else:  # Nhập thành phía hậu
                 self.board[move.end_row][move.end_column + 1] = self.board[move.end_row][
-                    move.end_column - 2]  # Moves rook
-                self.board[move.end_row][move.end_column - 2] = '--'  # Erases old rook
+                    move.end_column - 2]
+                self.board[move.end_row][move.end_column - 2] = '--'
             play_sound("move-self.mp3")
 
-        # Updates castling rights
+        # Cập nhật quyền đúc
         self.update_castle_rights(move)
         self.castle_rights_log.append(CastleRights(self.white_castle_king_side, self.black_castle_king_side,
                                                    self.white_castle_queen_side, self.black_castle_queen_side))
 
-        self.white_to_move = not self.white_to_move  # Switches turns
+        self.white_to_move = not self.white_to_move  # Biến các công tắc
 
+        # Ăn quân cờ
         if move.piece_captured != '--':
             if move.piece_captured[0] == 'w':
                 self.white_captured_pieces.append(move.piece_captured)
@@ -160,44 +161,44 @@ class GameState:
                 self.black_captured_pieces.append(move.piece_captured)
 
     def undo_move(self):
-        """Undos last move made"""
-        if len(self.move_log) != 0:  # Makes sure that there is a move to undo
+        """Hoàn tác nước đi"""
+        if len(self.move_log) != 0:  # Đảm bảo rằng có một động thái để hoàn tác
             move = self.move_log.pop()
             self.board[move.start_row][move.start_column] = move.piece_moved
             self.board[move.end_row][move.end_column] = move.piece_captured
-            self.white_to_move = not self.white_to_move  # Switches turn back
+            self.white_to_move = not self.white_to_move  # Bật công tắc trở lại
 
-            # Updates king positions
+            # Cập nhật vị trí vua
             if move.piece_moved == 'wK':
                 self.white_king_location = (move.start_row, move.start_column)
             elif move.piece_moved == 'bK':
                 self.black_king_location = (move.start_row, move.start_column)
 
-            # En passant
+            # Bắt tốt qua đường
             if move.is_en_passant_move:
-                self.board[move.end_row][move.end_column] = '--'  # Leaves landing square blank
-                self.board[move.start_row][move.end_column] = move.piece_captured  # Allows en passant on the next move
+                self.board[move.end_row][move.end_column] = '--'  # Lá hạ cánh vuông trống
+                self.board[move.start_row][move.end_column] = move.piece_captured  # Cho phép bằng cách chuyển sang bước tiếp theo
             self.en_passant_possible_log.pop()
             self.en_passant_possible = self.en_passant_possible_log[-1]
 
-            # Castling rights
-            self.castle_rights_log.pop()  # Gets rid of new castle rights from move undoing
+            # Quyền đúc
+            self.castle_rights_log.pop()  # Loại bỏ các quyền lâu đài mới khỏi di chuyển hoàn tác
             castle_rights = self.castle_rights_log[-1]
             self.white_castle_king_side = castle_rights.white_king_side
             self.black_castle_king_side = castle_rights.black_king_side
             self.white_castle_queen_side = castle_rights.white_queen_side
             self.black_castle_queen_side = castle_rights.black_queen_side
 
-            # Castling
+            # Nhập Thành
             if move.is_castle_move:
-                if move.end_column - move.start_column == 2:  # King side
+                if move.end_column - move.start_column == 2:  # Phía vua
                     self.board[move.end_row][move.end_column + 1] = self.board[move.end_row][move.end_column - 1]
                     self.board[move.end_row][move.end_column - 1] = '--'
-                else:  # Queen side
+                else:  # Phía hậu
                     self.board[move.end_row][move.end_column - 2] = self.board[move.end_row][move.end_column + 1]
                     self.board[move.end_row][move.end_column + 1] = '--'
 
-            # Restore captured pieces
+            # Khôi phục quân cờ bị ăn
             if move.piece_captured:
                 if move.piece_captured[0] == 'w':
                     self.white_captured_pieces.remove(move.piece_captured)
@@ -208,41 +209,41 @@ class GameState:
             self.stalemate = False
 
     def get_valid_moves(self):
-        """Gets all moves considering checks"""
+        """Nhận tất cả các động tác xem xét séc"""
         valid_moves = []
         self.in_check, self.pins, self.checks = self.check_for_pins_and_checks()
 
-        # Updates king locations
+        # Cập nhật vị trí vua
         if self.white_to_move:
             king_row, king_column = self.white_king_location[0], self.white_king_location[1]
         else:
             king_row, king_column = self.black_king_location[0], self.black_king_location[1]
 
         if self.in_check:
-            if len(self.checks) == 1:  # Only 1 check: block check or move king
+            if len(self.checks) == 1:  #Chỉ có 1 Kiểm tra: Kiểm tra khối hoặc Di chuyển King King
                 valid_moves = self.get_all_possible_moves()
                 check = self.checks[0]
                 check_row, check_column = check[0], check[1]
-                piece_checking = self.board[check_row][check_column]  # Enemy piece causing check
+                piece_checking = self.board[check_row][check_column]  # Mảnh kẻ thù gây ra séc
                 valid_squares = []
                 if piece_checking == 'N':
                     valid_squares = [(check_row, check_column)]
                 else:
                     for i in range(1, len(self.board)):
-                        valid_square = (king_row + check[2] * i, king_column + check[3] * i)  # 2 & 3 = check directions
+                        valid_square = (king_row + check[2] * i, king_column + check[3] * i)  # 2 và 3 = Hướng dẫn kiểm tra
                         valid_squares.append(valid_square)
                         if valid_square[0] == check_row and valid_square[1] == check_column:
                             break
-                for i in range(len(valid_moves) - 1, -1, -1):  # Gets rid of move not blocking, checking, or moving king
+                for i in range(len(valid_moves) - 1, -1, -1):  # Loại bỏ việc di chuyển không chặn, kiểm tra hoặc di chuyển vua
                     if valid_moves[i].piece_moved[1] != 'K':
                         if not (valid_moves[i].end_row, valid_moves[i].end_column) in valid_squares:
                             valid_moves.remove(valid_moves[i])
-            else:  # Double check, king must move
+            else:  # Kiểm tra gấp đôi, King phải di chuyển
                 self.get_king_moves(king_row, king_column, valid_moves)
-        else:  # Not in check
+        else:  # Không kiểm tra
             valid_moves = self.get_all_possible_moves()
 
-        if len(valid_moves) == 0:  # Either checkmate or stalemate
+        if len(valid_moves) == 0:  # Kiểm tra thắng hay hòa
             if self.in_check:
                 self.checkmate = True
             else:
@@ -254,18 +255,18 @@ class GameState:
         return valid_moves
 
     def get_all_possible_moves(self):
-        """Gets all moves without considering checks"""
+        """Có tất cả các động tác mà không cần xem xét séc"""
         moves = []
-        for row in range(len(self.board)):  # Number of rows
-            for column in range(len(self.board[row])):  # Number of columns in each row
+        for row in range(len(self.board)):  # Số lượng hàng
+            for column in range(len(self.board[row])):  # Số lượng cột trong mỗi hàng
                 turn = self.board[row][column][0]
                 if (turn == 'w' and self.white_to_move) or (turn == 'b' and not self.white_to_move):
                     piece = self.board[row][column][1]
-                    self.move_functions[piece](row, column, moves)  # Calls move function based on piece type
+                    self.move_functions[piece](row, column, moves)  # Cuộc gọi chức năng di chuyển dựa trên mảnh loại
         return moves
 
     def get_pawn_moves(self, row, column, moves):
-        """Gets all pawn moves for the pawn located at (row, column) and adds moves to move log"""
+        """Nhận tất cả các động tác cầm đồ cho quân tốt nằm ở (hàng, cột) và thêm các động tác để di chuyển nhật ký"""
         piece_pinned = False
         pin_direction = ()
         for i in range(len(self.pins) - 1, -1, -1):
@@ -289,29 +290,29 @@ class GameState:
             king_row, king_column = self.black_king_location
         pawn_promotion = False
 
-        if self.board[row + move_amount][column] == '--':  # 1 square move
+        if self.board[row + move_amount][column] == '--':  # Di chuyển 1 ô
             if not piece_pinned or pin_direction == (move_amount, 0):
-                if row + move_amount == back_row:  # If piece gets to back rank, it is a pawn promotion
+                if row + move_amount == back_row:  # Nếu mảnh được xếp hạng trở lại, đó là một chương trình khuyến mãi cầm đồ
                     pawn_promotion = True
                 moves.append(
                     Move((row, column), (row + move_amount, column), self.board, pawn_promotion=pawn_promotion))
-                if row == start_row and self.board[row + 2 * move_amount][column] == '--':  # 2 square advance
+                if row == start_row and self.board[row + 2 * move_amount][column] == '--':  # Di chuyển 2 ô
                     moves.append(Move((row, column), (row + 2 * move_amount, column), self.board))
-        if column - 1 >= 0:  # Captures left
+        if column - 1 >= 0:  # Ăn chéo
             if not piece_pinned or pin_direction == (move_amount, -1):
                 if self.board[row + move_amount][column - 1][0] == opponent:
-                    if row + move_amount == back_row:  # If piece gets to back rank, it is a pawn promotion
+                    if row + move_amount == back_row:  # Nếu mảnh được xếp hạng trở lại, đó là một chương trình khuyến mãi cầm đồ
                         pawn_promotion = True
                     moves.append(Move((row, column), (row + move_amount, column - 1),
                                       self.board, pawn_promotion=pawn_promotion))
                 if (row + move_amount, column - 1) == self.en_passant_possible:
                     attacking_piece = blocking_piece = False
                     if king_row == row:
-                        if king_column < column:  # King is left of pawn
-                            # inside_range between king and pawn; outside_range between pawn and border
+                        if king_column < column:  # Vua còn lại của quân tốt
+                            # Inside_range giữa vua và cầm đồ; Bên ngoài_range giữa cầm đồ và biên giới
                             inside_range = range(king_column + 1, column - 1)
                             outside_range = range(column + 1, len(self.board))
-                        else:  # King is right of pawn
+                        else:  # Vua là đúng của quân tốt
                             inside_range = range(king_column - 1, column, -1)
                             outside_range = range(column - 2, -1, -1)
                         for i in inside_range:
@@ -325,21 +326,21 @@ class GameState:
                                 blocking_piece = True
                     if not attacking_piece or blocking_piece:
                         moves.append(Move((row, column), (row + move_amount, column - 1), self.board, en_passant=True))
-        if column + 1 <= len(self.board) - 1:  # Captures right
+        if column + 1 <= len(self.board) - 1:  # Bắt đúng
             if not piece_pinned or pin_direction == (move_amount, 1):
                 if self.board[row + move_amount][column + 1][0] == opponent:
-                    if row + move_amount == back_row:  # If piece gets to back rank, it is a pawn promotion
+                    if row + move_amount == back_row:  # Nếu mảnh được xếp hạng trở lại, đó là một chương trình khuyến mãi cầm đồ
                         pawn_promotion = True
                     moves.append(Move((row, column), (row + move_amount, column + 1),
                                       self.board, pawn_promotion=pawn_promotion))
                 if (row + move_amount, column + 1) == self.en_passant_possible:
                     attacking_piece = blocking_piece = False
                     if king_row == row:
-                        if king_column < column:  # King is left of pawn
-                            # inside_range between king and pawn; outside_range between pawn and border
+                        if king_column < column:  # Vua còn lại của quân tốt
+                            # Inside_range giữa vua và cầm đồ; Bên ngoài_range giữa cầm đồ và biên giới
                             inside_range = range(king_column + 1, column)
                             outside_range = range(column + 2, len(self.board))
-                        else:  # King is right of pawn
+                        else:  # Vua là đúng của quân tốt
                             inside_range = range(king_column - 1, column + 1, -1)
                             outside_range = range(column - 1, -1, -1)
                         for i in inside_range:
@@ -355,7 +356,7 @@ class GameState:
                         moves.append(Move((row, column), (row + move_amount, column + 1), self.board, en_passant=True))
 
     def get_rook_moves(self, row, column, moves):
-        """Gets all rook moves for the rook located at (row, column) and adds moves to move log"""
+        """Nhận tất cả các di chuyển quân xe cho quân xe nằm ở (hàng, cột) và thêm các di chuyển để di chuyển nhật ký"""
         opponent = 'b' if self.white_to_move else 'w'
 
         piece_pinned = False
@@ -364,30 +365,30 @@ class GameState:
             if self.pins[i][0] == row and self.pins[i][1] == column:
                 piece_pinned = True
                 pin_direction = (self.pins[i][2], self.pins[i][3])
-                if self.board[row][column][1] != 'Q':  # Can't remove queen from pin on rook moves (only bishop moves)
+                if self.board[row][column][1] != 'Q': # Không thể loại bỏ nữ hoàng khỏi pin trên các động tác quân xe (chỉ di chuyển của giám mục)
                     self.pins.remove(self.pins[i])
                 break
 
-        directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]  # Tuples indicate (row, column) movements possible
+        directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]  # Tuples chỉ ra các chuyển động (hàng, cột) có thể
         for d in directions:
             for i in range(1, len(self.board)):
-                end_row = row + d[0] * i  # Potentially moves up/down to 7 rows
-                end_column = column + d[1] * i  # Potentially moves up/down to 7 columns
-                if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Makes sure on the board
+                end_row = row + d[0] * i  # Di chuyển mạnh lên/xuống 7 hàng
+                end_column = column + d[1] * i  # Di chuyển mạnh lên/xuống 7 cột
+                if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Đảm bảo trên bảng
                     if not piece_pinned or pin_direction == d or pin_direction == (-d[0], -d[1]):
                         end_piece = self.board[end_row][end_column]
-                        if end_piece == '--':  # Valid move to empty space
+                        if end_piece == '--':  # Di chuyển hợp lệ đến không gian trống
                             moves.append(Move((row, column), (end_row, end_column), self.board))
-                        elif end_piece[0] == opponent:  # Valid move to capture
+                        elif end_piece[0] == opponent:  # Di chuyển hợp lệ để bắt giữ
                             moves.append(Move((row, column), (end_row, end_column), self.board))
                             break
-                        else:  # Cannot take friendly piece
+                        else:  # Không thể lấy mảnh thân thiện
                             break
-                else:  # Cannot move off board
+                else:  # Không thể di chuyển khỏi bảng
                     break
 
     def get_knight_moves(self, row, column, moves):
-        """Gets all knight moves for the knight located at (row, column) and adds moves to move log"""
+        """Nhận tất cả các di chuyển quân tươợng cho quân tượng nằm ở (hàng, cột) và thêm các động tác để di chuyển nhật ký"""
         opponent = 'b' if self.white_to_move else 'w'
 
         piece_pinned = False
@@ -397,22 +398,22 @@ class GameState:
                 self.pins.remove(self.pins[i])
                 break
 
-        # Tuples indicate (row, column) movements possible
+        # Tuples chỉ ra các chuyển động (hàng, cột) có thể
         directions = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]
 
         for d in directions:
             end_row = row + d[0]
             end_column = column + d[1]
-            if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Makes sure on the board
+            if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Đảm bảo trên bảng
                 if not piece_pinned:
                     end_piece = self.board[end_row][end_column]
-                    if end_piece[0] == opponent:  # Valid move to capture
+                    if end_piece[0] == opponent:  # Di chuyển hợp lệ để bắt giữ
                         moves.append(Move((row, column), (end_row, end_column), self.board))
-                    elif end_piece == '--':  # Valid move to empty space
+                    elif end_piece == '--':  # Di chuyển hợp lệ đến không gian trống
                         moves.append(Move((row, column), (end_row, end_column), self.board))
 
     def get_bishop_moves(self, row, column, moves):
-        """Gets all bishop moves for the bishop located at (row, column) and adds moves to move log"""
+        """Nhận tất cả các di chuyển của quân mã cho quân mã nằm ở (hàng, cột) và thêm các động tác để di chuyển nhật ký"""
         opponent = 'b' if self.white_to_move else 'w'
 
         piece_pinned = False
@@ -424,45 +425,45 @@ class GameState:
                 self.pins.remove(self.pins[i])
                 break
 
-        directions = [(-1, -1), (-1, 1), (1, 1), (1, -1)]  # Tuples indicate (row, column) movements possible
+        directions = [(-1, -1), (-1, 1), (1, 1), (1, -1)]  # Tuples chỉ ra các chuyển động (hàng, cột) có thể
         for d in directions:
             for i in range(1, len(self.board)):
 
-                # See get_rook_moves for explanation; same here but for diagonals
+                # Xem get_rook_moves để giải thích; tương tự như vậy nhưng cho các đường chéo
                 end_row = row + d[0] * i
                 end_column = column + d[1] * i
 
-                if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Makes sure on the board
+                if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Đảm bảo trên bảng
                     if not piece_pinned or pin_direction == d or pin_direction == (-d[0], -d[1]):
                         end_piece = self.board[end_row][end_column]
-                        if end_piece == '--':  # Valid move to empty space
+                        if end_piece == '--':  # Di chuyển hợp lệ đến không gian trống
                             moves.append(Move((row, column), (end_row, end_column), self.board))
-                        elif end_piece[0] == opponent:  # Valid move to capture
+                        elif end_piece[0] == opponent:  # Di chuyển hợp lệ để bắt giữ
                             moves.append(Move((row, column), (end_row, end_column), self.board))
                             break
-                        else:  # Cannot take friendly piece
+                        else:  # Không thể lấy mảnh thân thiện
                             break
-                else:  # Cannot move off board
+                else:  # Không thể di chuyển khỏi bảng
                     break
 
     def get_queen_moves(self, row, column, moves):
-        """Gets all queen moves for the queen located at (row, column) and adds moves to move log"""
+        """Nhận tất cả các động thái của quân hậu cho quân hậu nằm ở (hàng, cột) và thêm các động tác để di chuyển nhật ký"""
         self.get_bishop_moves(row, column, moves)
         self.get_rook_moves(row, column, moves)
 
     def get_king_moves(self, row, column, moves):
-        """Gets all king moves for the king located at (row, column) and adds moves to move log"""
+        """Nhận tất cả các động thái của quân vua cho quân vua nằm ở (hàng, cột) và thêm các động tác để di chuyển nhật ký"""
         ally = 'w' if self.white_to_move else 'b'
         row_moves = (-1, -1, -1, 0, 0, 1, 1, 1)
         column_moves = (-1, 0, 1, -1, 1, -1, 0, 1)
         for i in range(len(self.board)):
             end_row = row + row_moves[i]
             end_column = column + column_moves[i]
-            if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Makes sure on the board
+            if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):  # Đảm bảo trên bảng
                 end_piece = self.board[end_row][end_column]
-                if end_piece[0] != ally:  # Empty or enemy piece
+                if end_piece[0] != ally:  # Mảnh trống hoặc kẻ thù
 
-                    # Places king on end square and checks for checks
+                    # Vua trên quảng trường và kiểm tra séc
                     if ally == 'w':
                         self.white_king_location = (end_row, end_column)
                     else:
@@ -471,7 +472,7 @@ class GameState:
                     if not in_check:
                         moves.append(Move((row, column), (end_row, end_column), self.board))
 
-                    # Places king back on original location
+                    # Vua trở lại cho thuê ban đầu
                     if ally == 'w':
                         self.white_king_location = (row, column)
                     else:
@@ -480,11 +481,11 @@ class GameState:
 
     def get_castle_moves(self, row, column, moves, ally):
         """
-        Generates all valid castle moves for the king at (row, column).
-        Adds valid castle moves to the list of moves.
+        Tạo tất cả các di chuyển nhập thành hợp lệ cho quân vua tại (hàng, cột).
+        Thêm di chuyển nhập thành hợp lệ vào danh sách các di chuyển.
         """
         if self.square_under_attack(row, column, ally):
-            return  # Can't castle while in check
+            return  # Không thể nhập thành khi đang bị chiếu
         if (self.white_to_move and self.white_castle_king_side) or \
                 (not self.white_to_move and self.black_castle_king_side):
             self.get_king_side_castle_moves(row, column, moves, ally)
@@ -505,9 +506,9 @@ class GameState:
             moves.append(Move((row, column), (row, column - 2), self.board, castle=True))
 
     def update_castle_rights(self, move):
-        """Updates castle rights given the move"""
+        """Cập nhật quyền nhập thành được đưa ra để di chuyển"""
 
-        # If king or rook moved
+        # Nếu quân vua hay quân xe di chuyển
         if move.piece_moved == 'wK':
             self.white_castle_queen_side = False
             self.white_castle_king_side = False
@@ -527,7 +528,7 @@ class GameState:
                 elif move.start_column == 0:
                     self.black_castle_queen_side = False
 
-        # If rook is captured
+        # Nếu xe bị bắt
         if move.piece_captured == 'wR':
             if move.end_row == 7:
                 if move.end_column == 0:
@@ -542,7 +543,7 @@ class GameState:
                     self.black_castle_king_side = False
 
     def square_under_attack(self, row, column, ally):
-        """Checks outward from a square to see if it is being attacked, thus invalidating castling"""
+        """Kiểm tra bên ngoài từ một hình vuông để xem nó có bị tấn công hay không, do đó làm mất hiệu lực Castling"""
         opponent = 'b' if self.white_to_move else 'w'
         directions = ((-1, 0), (0, -1), (1, 0), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1))
         for j in range(len(directions)):
@@ -552,7 +553,7 @@ class GameState:
                 end_column = column + d[1] * i
                 if 0 <= end_row < len(self.board) and 0 <= end_column < len(self.board):
                     end_piece = self.board[end_row][end_column]
-                    if end_piece[0] == ally:  # no attack from that direction
+                    if end_piece[0] == ally:  # Không có cuộc tấn công từ hướng đó
                         break
                     elif end_piece[0] == opponent:
                         piece_type = end_piece[1]
@@ -561,9 +562,9 @@ class GameState:
                                                                    or (opponent == 'b' and 4 <= j <= 5))) or \
                                 (piece_type == 'Q') or (i == 1 and piece_type == 'K'):
                             return True
-                        else:  # Enemy piece but not applying check
+                        else:  # Mảnh kẻ thù nhưng không áp dụng kiểm tra
                             break
-                else:  # Off board
+                else:  # TẮT
                     break
         knight_moves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
         for move in knight_moves:
@@ -679,7 +680,7 @@ class GameState:
 
 
 class CastleRights:
-    """Data storage of current states of castling rights"""
+    """Lưu trữ dữ liệu về các trạng thái hiện tại của nhập thành"""
 
     def __init__(self, white_king_side, black_king_side, white_queen_side, black_queen_side):
         self.white_king_side = white_king_side
@@ -690,9 +691,9 @@ class CastleRights:
 
 class Move:
     """
-    Class responsible for storing information about particular moves,
-    including starting and ending positions, which pieces were moved and captured,
-    and special moves such as en passant, pawn promotion, and castling.
+    Lớp chịu trách nhiệm lưu trữ thông tin về các động thái cụ thể,
+    Bao gồm các vị trí bắt đầu và kết thúc, mà các mảnh được và bị bắt,
+    Và các động tác đặc biệt như nhân tiện, quảng cáo cầm đồ và đúc.
     """
     ranks_to_rows = {'1': 7, '2': 6, '3': 5, '4': 4,
                      '5': 3, '6': 2, '7': 1, '8': 0}
@@ -723,13 +724,13 @@ class Move:
         self.move_id = self.start_row * 1000 + self.start_column * 100 + self.end_row * 10 + self.end_column
 
     def __eq__(self, other):
-        """Overrides the equals method because a Class is used"""
+        """Ghi đè phương thức bằng vì"""
         if isinstance(other, Move):
             return self.move_id == other.move_id
         return False
 
     def get_chess_notation(self):
-        """Creates a rank and file chess notation"""
+        """Tạo ra một ký hiệu cờ vua và tập tin"""
         return self.get_rank_file(self.start_row, self.start_column) + self.get_rank_file(self.end_row, self.end_column)
 
     def get_rank_file(self, rank, column):
@@ -737,28 +738,28 @@ class Move:
 
     def __str__(self):
         """
-        Overrides string function to improve chess notation.
-        Does not 1) specify checks, 2) checkmate, or 3) when
-        multiple same-type pieces can capture the same square.
+        Chức năng Chuỗi ghi đè để cải thiện ký hiệu cờ vua.
+        Không 1) séc cụ thể, 2) Checkmate, Gold 3) Khi
+        Nhiều mảnh cùng loại có thể chụp cùng một hình vuông.
         """
-        # Castling
+        # Nhập thành
         if self.is_castle_move:
             return 'O-O' if self.end_column == 6 else 'O-O-O'
 
         end_square = self.get_rank_file(self.end_row, self.end_column)
 
-        # Pawn moves
+        # Quân tốt di chuyển
         if self.piece_moved[1] == 'P':
-            if self.is_pawn_promotion and not self.is_capture:  # Pawn promotion
+            if self.is_pawn_promotion and not self.is_capture:  # Phong cấp
                 return f'{end_square}={promoted_piece}'
-            elif self.is_capture and self.is_pawn_promotion:  # Capture move
+            elif self.is_capture and self.is_pawn_promotion:  # Ăn quân và phong cấp
                 return f'{self.columns_to_files[self.start_column]}x{end_square}={promoted_piece}'
-            elif self.is_capture and not self.is_pawn_promotion:  # Capture move
+            elif self.is_capture and not self.is_pawn_promotion:  # Ăn quân
                 return f'{self.columns_to_files[self.start_column]}x{end_square}'
-            else:  # Normal movement
+            else:  # di chuyển bình tường
                 return end_square
 
-        # Other piece moves
+        # Các quân còn lại
         move_string = self.piece_moved[1]
         if self.is_capture:
             move_string += 'x'
