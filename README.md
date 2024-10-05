@@ -1,8 +1,7 @@
-# **Dự Án Cờ Vua Bằng Python**
-
 <div align="center">
     <img src="images/logo.png" alt="Ảnh gif gameplay" width="100" height="100">
 </div>
+# **Dự Án Cờ Vua Bằng Python**
 
 ## 1. Giới Thiệu
 
