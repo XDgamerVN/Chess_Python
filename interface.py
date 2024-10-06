@@ -71,11 +71,12 @@ def support(SQ_SIZE):
 def setting(SQ_SIZE, size_index):
     """Hiển thị menu thiết lập"""
     # Khởi tạo kích thước ban đầu
-    global WIDTH, HEIGHT, screen
+    global WIDTH, HEIGHT, screen, apply
     sizes = [(960, 540), (1120, 630), (1280, 720), (1440, 810), (1600, 900)]
     WIDTH, HEIGHT = sizes[size_index]
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     in_settings = True
+    apply = True
     screen.fill(COLOR_SCREEN)
     while in_settings:
         # Vẽ các nút tỉ lệ màn hình
