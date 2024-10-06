@@ -93,17 +93,36 @@ sudo zypper install python3 python3-pip
 sudo zypper install SDL2_mixer-devel libjpeg8-devel zlib-devel
 ```
 
+#### macOS:
+
+- Cài đặt Homebrew nếu chưa có:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+- Cài đặt các thư viện cần thiết:
+
+```bash
+brew install python
+brew install sdl2 sdl2_mixer libjpeg zlib
+```
+
 #### Windows:
 
 - Tải Python từ trang chính thức: [python.org](https://www.python.org/)
 - Chạy trình cài đặt.
 - Mở Command Prompt và kiểm tra phiên bản Python bằng lệnh:
 
+#### kiểm tra phiên bản:
+
 ```bash
 python --version
 ```
 
-Dự án yêu cầu một số thư viện Python bổ sung như `pygame`, `qrcode`, và `Pillow`. Bạn có thể cài đặt tất cả bằng lệnh:
+#### Thư viện bổ sung:
+
+- Dự án yêu cầu một số thư viện Python bổ sung như `pygame`, `qrcode`, và `Pillow`. Bạn có thể cài đặt tất cả bằng lệnh:
 
 ```bash
 pip install pygame qrcode[pil] pillow
