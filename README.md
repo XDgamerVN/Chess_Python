@@ -86,6 +86,13 @@ sudo pacman -S python python-pip
 sudo pacman -S sdl2_mixer libjpeg-turbo zlib
 ```
 
+#### OpenSUSE:
+
+```bash
+sudo zypper install python3 python3-pip
+sudo zypper install SDL2_mixer-devel libjpeg8-devel zlib-devel
+```
+
 #### Windows:
 
 - Tải Python từ trang chính thức: [python.org](https://www.python.org/)
