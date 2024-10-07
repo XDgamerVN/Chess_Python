@@ -5,6 +5,8 @@ from negamaxAI import *
 
 pygame.init()
 version = "v0.5"
+# Đặt size_index làm biến toàn cục
+size_index = 3  # Mặc định khởi tạo ở tỉ lệ 3
 
 def support(SQ_SIZE):
     """Hiển thị cửa sổ hỗ trợ"""
@@ -72,11 +74,11 @@ def setting(SQ_SIZE, size_index):
     """Hiển thị menu thiết lập"""
     # Khởi tạo kích thước ban đầu
     global WIDTH, HEIGHT, screen, apply
+    apply = True
     sizes = [(960, 540), (1120, 630), (1280, 720), (1440, 810), (1600, 900)]
     WIDTH, HEIGHT = sizes[size_index]
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     in_settings = True
-    apply = True
     screen.fill(COLOR_SCREEN)
     while in_settings:
         # Vẽ các nút tỉ lệ màn hình
@@ -329,8 +331,7 @@ def play_game(SQ_SIZE):
 def main_menu():
     """Hiển thị menu chính"""
     running = True
-    global WIDTH, HEIGHT, SQ_SIZE, screen
-    size_index = 3  # Chỉ số kích thước hiện tại
+    global WIDTH, HEIGHT, SQ_SIZE, screen, size_index
     SQ_SIZE = HEIGHT // 8
     screen.fill(COLOR_SCREEN)
     while running:
