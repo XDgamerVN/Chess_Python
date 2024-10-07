@@ -32,7 +32,7 @@ Dưới đây là danh sách các file Python trong dự án cùng với mô t�
 - **`images.py`**: Ảnh được mã hóa base64
 - **`sounds_encoding.py`**: Mã háo âm thanh base64
 - **`sounds.py`**: Âm thanh được mã hóa base64
-- **`decrypt`**: Trình giải mã base64
+- **`decrypt.py`**: Trình giải mã base64
 
 ---
 
