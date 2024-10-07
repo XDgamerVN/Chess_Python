@@ -34,6 +34,8 @@ Dưới đây là danh sách các file Python trong dự án cùng với mô t�
 - **`sounds.py`**: Âm thanh được mã hóa
 - **`decrypt`**: Trình giải mã
 
+"Mã hóa dữ liệu chỉ mục đích xuất phần mêm độc lập"
+
 ---
 
 ## 3. Yêu Cầu Hệ Thống
