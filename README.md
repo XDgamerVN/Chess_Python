@@ -145,14 +145,11 @@ python main.py
 
 Bây gờ bạn có thể chơi cùng bạn bè hoặc thử thách với máy (negamaxAI)
 
-#### Các lưu ý cho người dùng Linux:
+### 4.6. Lưu ý:
 
-- Khi có vấn đề liên quan âm thanh hoặc giao diện, thì bạn phải cài đặt các thư viện bổ sung như đã nêu trên.
-- Nếu cần, bạn có thể cấp quyền thực thi cho tệp main.py bằng lệnh:
-
-```bash
-chmod +x main.py
-```
+- Với Thư mục **`images/`**, khi bạn muốn thay đổi ảnh quân cờ thì bạn cần phải mã hóa trước với **`images_encoding.py`**.
+- Với Thư mục **`sounds/`**, khi có thể thay đổi âm thanh cờ thì thì bạn cần phải mã hóa trước với **`sounds_encoding.py`**.
+- Việc mã hóa này có mục đích tạo chương trình độc lập và không cần phải có **`images/`** với **`sounds/`** ở cạnh.
 
 ---
 
