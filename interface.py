@@ -2,9 +2,10 @@ from additions import *
 from engine import *
 from system import *
 from negamaxAI import *
+from decrypt import *
 
 pygame.init()
-version = "v0.5"
+version = "v0.6"
 # Đặt size_index làm biến toàn cục
 size_index = 3  # Mặc định khởi tạo ở tỉ lệ 3
 
@@ -60,7 +61,7 @@ def support(SQ_SIZE):
                     in_support = False
                     screen.fill(COLOR_GAME)
                 elif mew_game_button.collidepoint(event.pos):
-                    play_sound("game-start.mp3")
+                    play_sound("game-start")
                     play_game(SQ_SIZE)
                 elif main_menu_button.collidepoint(event.pos):
                     main_menu()
@@ -159,7 +160,7 @@ def stale_check(text, SQ_SIZE):
             quit()
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if new_game_button.collidepoint(event.pos):
-                play_sound("game-start.mp3")
+                play_sound("game-start")
                 play_game(SQ_SIZE)
             elif quit_button.collidepoint(event.pos):
                 main_menu()
@@ -229,15 +230,15 @@ def play_game(SQ_SIZE):
                             player_clicks = []
                             move_made = False
                             animate = False
-                            play_sound("move-self.mp3")
+                            play_sound("move-self")
                     elif negamax_button.collidepoint(event.pos):
                         not_negamax = not not_negamax
                         if not_negamax:
                             for _ in range(2):
-                                play_sound("negamax-off.mp3")
+                                play_sound("negamax-off")
                                 pygame.time.delay(100)
                         else:
-                            play_sound("negamax-on.mp3")
+                            play_sound("negamax-on")
 
 
                     if not game_over:
@@ -270,10 +271,10 @@ def play_game(SQ_SIZE):
                         not_negamax = not not_negamax
                         if not_negamax:
                             for _ in range(2):
-                                play_sound("negamax-off.mp3")
+                                play_sound("negamax-off")
                                 pygame.time.delay(100)
                         else:
-                            play_sound("negamax-on.mp3")
+                            play_sound("negamax-on")
                     elif event.key == pygame.K_u:
                         if len(game_state.move_log) > 0:
                             game_state.undo_move()
@@ -282,7 +283,7 @@ def play_game(SQ_SIZE):
                             player_clicks = []
                             move_made = False
                             animate = False
-                            play_sound("move-self.mp3")
+                            play_sound("move-self")
 
         # Tìm nước đi của AI
         if not game_over and not human_turn:
@@ -299,7 +300,7 @@ def play_game(SQ_SIZE):
             if animate:
                 animate_move(game_state.move_log[-1], screen, game_state.board, clock, game_state, SQ_SIZE)
                 animate = False
-                play_sound("move-self.mp3")
+                play_sound("move-self")
             valid_moves = game_state.get_valid_moves()
             move_made = False
 
@@ -312,7 +313,7 @@ def play_game(SQ_SIZE):
 
             # Phát âm thanh kết thúc game chỉ một lần
             if not sound_played:
-                play_sound("game-end.mp3")
+                play_sound("game-end")
                 sound_played = True
 
             # Hiển thị kết quả trò chơi
@@ -356,7 +357,7 @@ def main_menu():
                 quit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if play_button.collidepoint(event.pos):
-                    play_sound("game-start.mp3")
+                    play_sound("game-start")
                     play_game(SQ_SIZE)
                 elif setting_button.collidepoint(event.pos):
                     size_index, SQ_SIZE = setting(SQ_SIZE, size_index)  # Cập nhật size_index và SQ_SIZE từ setting()

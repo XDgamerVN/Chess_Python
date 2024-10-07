@@ -1,5 +1,6 @@
 from additions import *
 from constants import *
+from decrypt import *
 
 pygame.init()
 
@@ -26,23 +27,21 @@ def load_images(SQ_SIZE):
     pieces = ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR', 'wP',
               'bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR', 'bP']
     for piece in pieces:
-        images[piece] = (
-            pygame.transform.smoothscale(pygame.image.load(f'images/{piece}.png'), (SQ_SIZE, SQ_SIZE)))
+        images[piece] = decode_and_load_image(piece, (SQ_SIZE, SQ_SIZE))
 
 def load_captured_images(SQ_SIZE):
     """Tải ảnh các quân cờ bị ăn"""
     pieces = ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR', 'bP',
               'wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR', 'wP']
     for piece in pieces:
-        captures_images[piece] = (
-            pygame.transform.smoothscale(pygame.image.load(f'images/{piece}.png'), (SQ_SIZE // 2, SQ_SIZE // 2)))
+        captures_images[piece] = decode_and_load_image(piece, (SQ_SIZE // 2, SQ_SIZE // 2))
 
 def load_promote_images(SQ_SIZE):
     """Tải ảnh quân cần bắt"""
     pieces = ['wQ', 'wR', 'wB', 'wN', 'bQ', 'bR', 'bB', 'bN']
     for piece in pieces:
-        promote_images[piece] = (
-            pygame.transform.smoothscale(pygame.image.load(f'images/{piece}.png'), (SQ_SIZE, SQ_SIZE)))
+        promote_images[piece] = decode_and_load_image(piece, (SQ_SIZE, SQ_SIZE))
+
 
 def draw_board(screen, SQ_SIZE):
     """Vẽ giao diện bàn cờ"""

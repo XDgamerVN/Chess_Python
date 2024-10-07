@@ -66,12 +66,6 @@ def draw_rounded_rect(surface, rect, radius, color, border_width):
     border_rect = rect.inflate(border_width, border_width)
     pygame.draw.rect(surface, color, border_rect, border_radius=radius)
 
-def play_sound(sound_file):
-    """Hàm phát âm thanh từ file"""
-    pygame.mixer.init()
-    sound = pygame.mixer.Sound(f"sounds/{sound_file}")   # Trỏ đến thư mục sounds
-    sound.play()
-
 def qr_code(data, SQ_SIZE):
     """Hàm tạo mã QR từ dữ liệu đầu vào"""
     # Tạo mã QR bằng qrcode
@@ -233,6 +227,7 @@ def code_version(SQ_SIZE):
                 draw_button(message_text, SQ_SIZE // 2, SQ_SIZE * 4, SQ_SIZE * 2,
                             SQ_SIZE * 6, SQ_SIZE * 3, SQ_SIZE // 5, SQ_SIZE // 10,
                             'white', 'white', COLOR_SCREEN, COLOR_SCREEN, 'aquamarine')
+
                 if message_text == "Pass":
                     draw_button("DON'T SCAN ME!", SQ_SIZE // 3, SQ_SIZE * 7 - SQ_SIZE // 4, SQ_SIZE * 2,
                                 SQ_SIZE * 3, SQ_SIZE * 3, SQ_SIZE // 5, 0,
@@ -243,5 +238,6 @@ def code_version(SQ_SIZE):
                     screen.blit(qr_surface, qr_rect.topleft)
             else:
                 show_message = False  # Ẩn thông báo sau 5 giây
+
 
         pygame.display.flip()
