@@ -28,6 +28,11 @@ Dưới đây là danh sách các file Python trong dự án cùng với mô t�
 - **`interface.py`**: Định nghĩa giao diện người dùng cho trò chơi.
 - **`additions.py`**: Các bổ sung và tiện ích cho giao diện người dùng.
 - **`main.py`**: File khởi chạy chính của trò chơi.
+- **`images_encoding.py`**: Mã hóa ảnh
+- **`images.py`**: Ảnh được mã hóa
+- **`sounds_encoding.py`**: Mã háo âm thanh
+- **`sounds.py`**: Âm thanh được mã hóa
+- **`decrypt`**: Trình giải mã
 
 ---
 
