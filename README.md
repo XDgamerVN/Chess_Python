@@ -60,7 +60,7 @@ cd Chess_Python
 
 ### 4.2. Tạo Môi Trường Ảo (Tuỳ Chọn)
 
-Môi trường ảo giúp bạn quản lý các phụ thuộc cho dự án mà không làm ảnh hưởng đến các dự án khác:
+Môi trường ảo giúp bạn quản lý các thư viện cho dự án mà không làm ảnh hưởng đến các dự án khác:
 
 ```bash 
 python -m venv venv
