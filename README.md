@@ -16,6 +16,7 @@ Dự án được tổ chức theo cấu trúc sau:
 
 - **`images/`**: Thư mục chứa các tài nguyên hình ảnh quân cờ dưới định dạng PNG và ICO.
 - **`sounds/`**: Thư mục chứa các tài nguyên âm thanh dưới định dạng MP3.
+- **`videos/`**: Thư mục chứa các tài nguyên video dưới định dạng MP4.
 
 ### Các File Python
 
@@ -32,6 +33,7 @@ Dưới đây là danh sách các file Python trong dự án cùng với mô t�
 - **`decryption.py`**: Trình giải mã base64
 - **`images.py`**: Ảnh được mã hóa base64
 - **`sounds.py`**: Âm thanh được mã hóa base64
+- **`videos.py`**: Videos được mã hóa base64
 
 ---
 
