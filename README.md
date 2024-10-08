@@ -28,11 +28,10 @@ Dưới đây là danh sách các file Python trong dự án cùng với mô t�
 - **`interface.py`**: Định nghĩa giao diện người dùng cho trò chơi.
 - **`additions.py`**: Các bổ sung và tiện ích cho giao diện người dùng.
 - **`main.py`**: File khởi chạy chính của trò chơi.
-- **`images_encoding.py`**: Mã hóa ảnh base64
+- **`encryption.py`**: Trình mã hóa base64
+- **`decryption.py`**: Trình giải mã base64
 - **`images.py`**: Ảnh được mã hóa base64
-- **`sounds_encoding.py`**: Mã háo âm thanh base64
 - **`sounds.py`**: Âm thanh được mã hóa base64
-- **`decrypt.py`**: Trình giải mã base64
 
 ---
 
@@ -147,8 +146,6 @@ Bây gờ bạn có thể chơi cùng bạn bè hoặc thử thách với máy (
 
 ### 4.6. Lưu ý:
 
-- Với Thư mục **`images/`**, khi bạn muốn thay đổi ảnh quân cờ thì bạn cần phải mã hóa trước với **`images_encoding.py`**.
-- Với Thư mục **`sounds/`**, khi có thể thay đổi âm thanh cờ thì thì bạn cần phải mã hóa trước với **`sounds_encoding.py`**.
 - Việc mã hóa này có mục đích tạo chương trình độc lập và không cần phải có **`images/`** với **`sounds/`** ở cạnh.
 
 ---
