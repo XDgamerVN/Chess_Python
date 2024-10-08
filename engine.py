@@ -1,5 +1,5 @@
 from additions import *
-from decrypt import *
+from decryption import *
 from constants import *
 
 class GameState:

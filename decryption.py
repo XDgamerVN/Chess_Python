@@ -33,14 +33,19 @@ def play_sound(sound_name):
 # Giải mã video
 def play_video(video_name):
     """Hàm phát video từ dữ liệu đã mã hóa"""
-    # Giải mã chuỗi base64 thành dữ liệu nhị phân
-    video_bytes = base64.b64decode(videos[video_name])
-    # Ghi lại vào file tạm thời (hoặc bạn có thể phát trực tiếp)
-    with open('temp.mp4', 'wb') as output_file:
-        output_file.write(video_bytes)
-    # Phát video bằng moviepy
-    clip = VideoFileClip('temp.mp4')
-    clip.preview()  # Mở video trong cửa sổ phát video
-    # Dọn dẹp
-    clip.close()
-    os.remove('temp.mp4')
+    try:
+        # Giải mã chuỗi base64 thành dữ liệu nhị phân
+        video_bytes = base64.b64decode(videos[video_name])
+        # Ghi lại vào file tạm thời (hoặc bạn có thể phát trực tiếp)
+        with open('temp.mp4', 'wb') as output_file:
+            output_file.write(video_bytes)
+
+        # Phát video bằng moviepy
+        clip = VideoFileClip('temp.mp4')
+        clip.preview()  # Mở video trong cửa sổ phát video
+
+    finally:
+        # Dọn dẹp
+        clip.close()  # Đảm bảo video được đóng
+        if os.path.exists('temp.mp4'):
+            os.remove('temp.mp4')  # Xóa file tạm dù bất kỳ tình huống nào

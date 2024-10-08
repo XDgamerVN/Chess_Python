@@ -1,6 +1,6 @@
 from additions import *
 from constants import *
-from decrypt import *
+from decryption import *
 
 pygame.init()
 
