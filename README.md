@@ -44,8 +44,6 @@ Dưới đây là danh sách các file Python trong dự án cùng với mô t�
 - **Khuyên dùng**: IDE PyCharm
 - `Python`: 3.10.x hoặc cao hơn
 - `Pygame`: 2.6.0
-- `Pillow`: 10.8.0
-- `qrcode`: 8.0
 
 ## 4. Hướng Dẫn Bắt Đầu
 
@@ -131,7 +129,7 @@ python --version
 - Dự án yêu cầu một số thư viện Python bổ sung như `pygame`, `qrcode`, và `Pillow`. Bạn có thể cài đặt tất cả bằng lệnh:
 
 ```bash
-pip install pygame qrcode[pil] pillow
+pip install pygame 
 ```
 
 ### 4.4. Chạy Trò Chơi
