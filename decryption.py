@@ -1,6 +1,9 @@
 from images import images
 from sounds import sounds
+from videos import videos
+from moviepy.editor import VideoFileClip
 import base64
+import os
 import io
 import pygame
 
@@ -26,3 +29,18 @@ def play_sound(sound_name):
     sound_file = io.BytesIO(sound_data)  # Tạo stream từ dữ liệu đã giải mã
     sound = pygame.mixer.Sound(sound_file)  # Tải âm thanh từ stream
     sound.play()
+
+# Giải mã video
+def play_video(video_name):
+    """Hàm phát video từ dữ liệu đã mã hóa"""
+    # Giải mã chuỗi base64 thành dữ liệu nhị phân
+    video_bytes = base64.b64decode(videos[video_name])
+    # Ghi lại vào file tạm thời (hoặc bạn có thể phát trực tiếp)
+    with open('temp.mp4', 'wb') as output_file:
+        output_file.write(video_bytes)
+    # Phát video bằng moviepy
+    clip = VideoFileClip('temp.mp4')
+    clip.preview()  # Mở video trong cửa sổ phát video
+    # Dọn dẹp
+    clip.close()
+    os.remove('temp.mp4')
