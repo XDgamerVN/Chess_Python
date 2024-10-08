@@ -42,8 +42,8 @@ Dưới đây là danh sách các file Python trong dự án cùng với mô t�
 Để phát triển và chạy trò chơi, bạn cần:
 
 - **Khuyên dùng**: IDE PyCharm
-- `Python`: 3.10.x hoặc cao hơn
-- `Pygame`: 2.6.0
+- `Python`: 3.9.x hoặc cao hơn
+- `Pygame`: 2.6.0 hoặc cao hơn
 
 ## 4. Hướng Dẫn Bắt Đầu
 
