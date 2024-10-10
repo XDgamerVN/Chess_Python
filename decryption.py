@@ -7,7 +7,7 @@ import os
 import io
 import pygame
 
-def decode_and_load_image(piece, size):
+def decrypt_image(piece, size):
     """Giải mã và tải ảnh của quân cờ, điều chỉnh kích thước"""
     if isinstance(images[piece], str):  # Nếu ảnh là chuỗi base64
         image_data = base64.b64decode(images[piece])
@@ -20,7 +20,7 @@ def decode_and_load_image(piece, size):
     return pygame.transform.smoothscale(image, size)
 
 # Giải mã âm thanh và phát âm
-def play_sound(sound_name):
+def decrypt_sound(sound_name):
     """Hàm phát âm thanh từ dữ liệu đã mã hóa"""
     pygame.mixer.init()
 
@@ -31,7 +31,7 @@ def play_sound(sound_name):
     sound.play()
 
 # Giải mã video
-def play_video(video_name):
+def decrypt_video(video_name):
     """Hàm phát video từ dữ liệu đã mã hóa"""
     try:
         # Giải mã chuỗi base64 thành dữ liệu nhị phân
