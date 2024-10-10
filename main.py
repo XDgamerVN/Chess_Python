@@ -16,9 +16,9 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-icon = load_image('logo', (256, 256))
+icon = decrypt_image('logo', (256, 256))
 pygame.display.set_icon(icon)
-pygame.display.set_caption('Chess_Python by Nguyen Le Van Dung - Satoru Gojo Edition')
+pygame.display.set_caption('Chess_Python by Nguyen Le Van Dung')
 
 if __name__ == '__main__':
     main_menu()

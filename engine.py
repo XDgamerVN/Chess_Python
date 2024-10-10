@@ -146,7 +146,7 @@ class GameState:
                 self.board[move.end_row][move.end_column + 1] = self.board[move.end_row][
                     move.end_column - 2]
                 self.board[move.end_row][move.end_column - 2] = '--'
-            play_sound("move-self")
+            decrypt_sound("move-self")
 
         # Cập nhật quyền đúc
         self.update_castle_rights(move)
