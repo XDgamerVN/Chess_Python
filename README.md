@@ -165,8 +165,6 @@ Tôi dự định cập nhật dự án với những tính năng mới, bao g�
 
 - Cải thiện thuật toán AI.
 - Tính năng lưu trữ ván cờ.
-- Nâng cấp giao diện.
-- Tùy thỉnh giao diện quân cờ và bàn cờ.
 
 ---
 
