@@ -9,6 +9,40 @@ version = "v0.7"
 # Đặt size_index làm biến toàn cục
 size_index = 3  # Mặc định khởi tạo ở tỉ lệ 3
 
+def back_to_main_menu(SQ_SIZE):
+    """Kiểm tra xem người chơi có muốn thoát về màn hình chính hay không hay không"""
+    in_quit = True
+    while in_quit:
+        # Vẽ nút và các thông báo thoát game
+        draw_button("", 0,SQ_SIZE * 4, SQ_SIZE * 3,
+                    SQ_SIZE * 6, SQ_SIZE * 2, SQ_SIZE // 7, SQ_SIZE // 15,
+                    'white', 'black', COLOR_SCREEN, COLOR_SCREEN, 'aquamarine')
+
+        draw_button('Are you sure you want to back to main menu?', SQ_SIZE // 4 + SQ_SIZE // 14,
+                    SQ_SIZE * 7 - SQ_SIZE // 4,
+                    SQ_SIZE * 3 + SQ_SIZE // 2, SQ_SIZE // 2, SQ_SIZE // 2, SQ_SIZE // 7, 0,
+                    'white', 'white', COLOR_SCREEN, COLOR_SCREEN, COLOR_SCREEN)
+
+        yes_button = draw_button("Yes", SQ_SIZE // 3, SQ_SIZE * 5 + SQ_SIZE // 8, SQ_SIZE * 4 + SQ_SIZE // 4,
+                                 SQ_SIZE * 2 - SQ_SIZE // 4, SQ_SIZE // 2, SQ_SIZE // 7, SQ_SIZE // 22,
+                                 'white', 'black', COLOR_SCREEN, 'tomato', 'tomato')
+
+        no_button = draw_button("No", SQ_SIZE // 3, SQ_SIZE * 7 + SQ_SIZE // 8, SQ_SIZE * 4 + SQ_SIZE // 4,
+                                SQ_SIZE * 2 - SQ_SIZE // 4, SQ_SIZE // 2, SQ_SIZE // 7, SQ_SIZE // 22,
+                                'white', 'black', COLOR_SCREEN, 'light green', 'light green')
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pass
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if no_button.collidepoint(event.pos):
+                    return
+                elif yes_button.collidepoint(event.pos):
+                    main_menu()
+
+        clock.tick(60)
+        pygame.display.flip()
+
 def support(SQ_SIZE):
     """Hiển thị cửa sổ hỗ trợ"""
     in_support = True
@@ -27,19 +61,25 @@ def support(SQ_SIZE):
                     'white', 'white', COLOR_SCREEN, COLOR_SCREEN, 'grey')
 
         # Tạo font chữ
-        font_support  = pygame.font.SysFont('Arial', SQ_SIZE // 3)  # Điều chỉnh kích thước font nếu cần
+        font_support  = pygame.font.SysFont('Arial', SQ_SIZE // 4)  # Điều chỉnh kích thước font nếu cần
 
         # Tạo các dòng văn bản
         text_support1 = font_support.render("Support Keys:", True, 'white')
         text_support2 = font_support.render("•  U: Undo the last move", True, 'white')
-        text_support3 = font_support.render("•  N: Toggle Negamax", True, 'white')
-        text_support4 = font_support.render("•  ESC: Toggle support On/Off", True, 'white')
+        text_support3 = font_support.render("•  N: Toggle Negamax On/Off", True, 'white')
+        text_support4 = font_support.render("•  H: Toggle support On/Off", True, 'white')
+        text_support5 = font_support.render("•  R: Restart the game", True, 'white')
+        text_support6 = font_support.render("•  ESC: Quit the game", True, 'white')
+        text_support7 = font_support.render(f"Version: {version}", True, 'white')
 
         # Hiển thị các dòng văn bản tại vị trí text_support
         screen.blit(text_support1, (SQ_SIZE * 3 + SQ_SIZE // 2, SQ_SIZE + SQ_SIZE // 2))
         screen.blit(text_support2, (SQ_SIZE * 3 + SQ_SIZE // 2, SQ_SIZE * 2))
         screen.blit(text_support3, (SQ_SIZE * 3 + SQ_SIZE // 2, SQ_SIZE * 2 + SQ_SIZE // 2))
         screen.blit(text_support4, (SQ_SIZE * 3 + SQ_SIZE // 2, SQ_SIZE * 3))
+        screen.blit(text_support5, (SQ_SIZE * 3 + SQ_SIZE // 2, SQ_SIZE * 3 + SQ_SIZE // 2))
+        screen.blit(text_support6, (SQ_SIZE * 3 + SQ_SIZE // 2, SQ_SIZE * 4))
+        screen.blit(text_support7, (SQ_SIZE * 6 + SQ_SIZE // 2, SQ_SIZE * 5 - SQ_SIZE // 4))
 
         resume_button = draw_button('Resume', SQ_SIZE // 3, SQ_SIZE * 9 - SQ_SIZE // 2, SQ_SIZE * 1 + SQ_SIZE // 2,
                                     SQ_SIZE * 2, SQ_SIZE // 2, SQ_SIZE // 7,0,
@@ -53,21 +93,26 @@ def support(SQ_SIZE):
                                        SQ_SIZE * 2, SQ_SIZE // 2, SQ_SIZE // 7,0,
                                   'white', 'black', COLOR_SCREEN, 'aquamarine', COLOR_SCREEN)
 
+        support_button = draw_button('≡', SQ_SIZE // 3, SQ_SIZE * 13 + SQ_SIZE // 4, SQ_SIZE // 4,
+                                     SQ_SIZE / 2, SQ_SIZE // 2, SQ_SIZE // 5, 0,
+                                     'white', 'black', COLOR_SCREEN, 'white', 'black')
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 quit_game(SQ_SIZE)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if resume_button.collidepoint(event.pos):
+                if resume_button.collidepoint(event.pos) or support_button.collidepoint(event.pos):
                     in_support = False
-                    screen.fill(COLOR_GAME)
                 elif mew_game_button.collidepoint(event.pos):
                     play_sound("game-start")
                     play_game(SQ_SIZE)
                 elif main_menu_button.collidepoint(event.pos):
-                    main_menu()
+                    back_to_main_menu(SQ_SIZE)
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_h:
                     in_support = False
+                if event.key == pygame.K_ESCAPE:
+                    back_to_main_menu(SQ_SIZE)
         clock.tick(60)
         pygame.display.flip()
 
@@ -360,6 +405,7 @@ def play_game(SQ_SIZE):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     quit_game(SQ_SIZE)
+                    screen.fill(COLOR_GAME)
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if support_button.collidepoint(event.pos):
                         support(SQ_SIZE)
@@ -381,7 +427,6 @@ def play_game(SQ_SIZE):
                                 pygame.time.delay(100)
                         else:
                             play_sound("negamax-on")
-
 
                     if not game_over:
                         location = pygame.mouse.get_pos()
@@ -406,7 +451,7 @@ def play_game(SQ_SIZE):
                             if not move_made:
                                 player_clicks = [square_selected]
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+                    if event.key == pygame.K_h:
                         support(SQ_SIZE)
                         screen.fill(COLOR_GAME)
                     elif event.key == pygame.K_n:
@@ -426,6 +471,12 @@ def play_game(SQ_SIZE):
                             move_made = False
                             animate = False
                             play_sound("move-self")
+                    elif event.key == pygame.K_ESCAPE:
+                        back_to_main_menu(SQ_SIZE)
+                        screen.fill(COLOR_GAME)
+                    elif event.key == pygame.K_r:
+                        play_sound("game-start")
+                        play_game(SQ_SIZE)
 
         # Tìm nước đi của AI
         if not game_over and not human_turn:
