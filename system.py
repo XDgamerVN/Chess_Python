@@ -107,7 +107,7 @@ def highlight_squares(screen, game_state, square_selected, SQ_SIZE):
         row, column = square_selected
         if game_state.board[row][column][0] == ('w' if game_state.white_to_move else 'b'):
             highlight_selected = pygame.Surface((SQ_SIZE, SQ_SIZE))
-            highlight_selected.set_alpha(70)
+            highlight_selected.set_alpha(100)
             highlight_selected.fill(pygame.Color('black'))
             screen.blit(highlight_selected, (column * SQ_SIZE, row * SQ_SIZE))
 
@@ -117,7 +117,7 @@ def highlight_squares(screen, game_state, square_selected, SQ_SIZE):
         start_row, start_column = last_move.start_row, last_move.start_column
         end_row, end_column = last_move.end_row, last_move.end_column
         highlight_last = pygame.Surface((SQ_SIZE, SQ_SIZE))
-        highlight_last.set_alpha(70)
+        highlight_last.set_alpha(100)
         highlight_last.fill(pygame.Color('orange'))
         screen.blit(highlight_last, (start_column * SQ_SIZE, start_row * SQ_SIZE))
         screen.blit(highlight_last, (end_column * SQ_SIZE, end_row * SQ_SIZE))
